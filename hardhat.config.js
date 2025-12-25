@@ -1,7 +1,10 @@
 require("@nomicfoundation/hardhat-toolbox");
 const dot = require('dotenv').config();
 
-const { PRIVATE_KEY, API_URL_BASESEPOLIA, API_URL_SEPOLIA, API_URL_BASE, API_URL_DEGEN, BASESCAN_API_KEY} = process.env;
+const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001";
+const API_URL_BASESEPOLIA = process.env.API_URL_BASESEPOLIA || "https://sepolia.base.org";
+const API_URL_BASE = process.env.API_URL_BASE || "https://mainnet.base.org";
+const BASESCAN_API_KEY = process.env.BASESCAN_API_KEY || "";
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -18,16 +21,20 @@ module.exports = {
       },
     ] 
 },
-  defaultNetwork: "base",
+  defaultNetwork: "hardhat",
   networks: {
+    hardhat: {
+      chainId: 8453,
+      loggingEnabled: false,
+    },
     baseSepolia: {
       url: API_URL_BASESEPOLIA,
-      accounts: [`0x${PRIVATE_KEY}`],
+      accounts: [PRIVATE_KEY],
       gasPrice: 1000000000 * 10,
     },
     base: {
       url: API_URL_BASE,
-      accounts: [`0x${PRIVATE_KEY}`],
+      accounts: [PRIVATE_KEY],
     }
   },
    etherscan: {
