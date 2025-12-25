@@ -4,8 +4,9 @@
 set -e
 
 echo "🔧 Configuring Git..."
-git config user.name "cryptonique0"
-git config user.email "abdulganiyu838@gmail.com"
+# Note: Configure with your own Git credentials
+# git config user.name "your-username"
+# git config user.email "your-email@example.com"
 
 echo "📝 Adding all changes..."
 git add .
