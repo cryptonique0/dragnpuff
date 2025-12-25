@@ -2,8 +2,9 @@ require("@nomicfoundation/hardhat-toolbox");
 const dot = require('dotenv').config();
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001";
-const API_URL_BASESEPOLIA = process.env.API_URL_BASESEPOLIA || "https://sepolia.base.org";
-const API_URL_BASE = process.env.API_URL_BASE || "https://mainnet.base.org";
+// Support both new and legacy env var names for RPC URLs
+const API_URL_BASE = process.env.BASE_RPC_URL || process.env.API_URL_BASE || "https://mainnet.base.org";
+const API_URL_BASESEPOLIA = process.env.BASE_SEPOLIA_RPC_URL || process.env.API_URL_BASESEPOLIA || "https://sepolia.base.org";
 const BASESCAN_API_KEY = process.env.BASESCAN_API_KEY || "";
 
 /** @type import('hardhat/config').HardhatUserConfig */
