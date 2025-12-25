@@ -10,6 +10,23 @@ artifacts/
 firebase/functions/dragn/meta/
 ignition/deployments/
 
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+.runtimeconfig.json
+
+# Firebase
+firebase-debug.log
+emulator-data/
+
 # Logs
 logs
 *.log
