@@ -2,7 +2,6 @@
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
@@ -20,7 +19,7 @@ contract DragNBadges is ERC721Enumerable, Ownable {
     event BadgeAwarded(address indexed to, uint256 indexed tokenId, BadgeType badge);
     event BadgeURISet(uint8 indexed badgeType, string uri);
 
-    constructor() ERC721("DragN Badges", "DRAGNBADGE") Ownable(msg.sender) {}
+    constructor() ERC721("DragN Badges", "DRAGNBADGE") {}
 
     function _makeTokenId(address to, BadgeType badge) internal pure returns (uint256) {
         return uint256(keccak256(abi.encode(to, badge)));
@@ -36,7 +35,7 @@ contract DragNBadges is ERC721Enumerable, Ownable {
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require(_ownerOf(tokenId) != address(0), "Nonexistent token");
+        require(_exists(tokenId), "Nonexistent token");
         uint8 b = uint8(_badgeTypeOf[tokenId]);
         string memory base = _badgeURIs[b];
         return bytes(base).length > 0 ? base : "";
@@ -44,26 +43,38 @@ contract DragNBadges is ERC721Enumerable, Ownable {
 
     function hasBadge(address account, BadgeType badge) public view returns (bool) {
         uint256 tokenId = _makeTokenId(account, badge);
-        return _ownerOf(tokenId) != address(0);
+        return _exists(tokenId);
     }
 
     function awardBadge(address to, BadgeType badge) external onlyOwner returns (uint256) {
         require(to != address(0), "Invalid address");
         require(badge != BadgeType.Unknown, "Invalid badge");
         uint256 tokenId = _makeTokenId(to, badge);
-        require(_ownerOf(tokenId) == address(0), "Already awarded");
+        require(!_exists(tokenId), "Already awarded");
         _safeMint(to, tokenId);
         _badgeTypeOf[tokenId] = badge;
         emit BadgeAwarded(to, tokenId, badge);
         return tokenId;
     }
 
-    // Soulbound: disable transfers by reverting in _update hook
-    function _update(address to, uint256 tokenId, address auth) internal virtual override returns (address) {
-        address from = _ownerOf(tokenId);
-        if (from != address(0) && to != address(0)) {
-            revert("Soulbound: non-transferable");
-        }
-        return super._update(to, tokenId, auth);
+    // Soulbound restrictions: disable approvals and transfers
+    function approve(address to, uint256 tokenId) public override {
+        revert("Soulbound: approvals disabled");
+    }
+
+    function setApprovalForAll(address operator, bool approved) public override {
+        revert("Soulbound: approvals disabled");
+    }
+
+    function transferFrom(address from, address to, uint256 tokenId) public override {
+        revert("Soulbound: non-transferable");
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId) public override {
+        revert("Soulbound: non-transferable");
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override {
+        revert("Soulbound: non-transferable");
     }
 }

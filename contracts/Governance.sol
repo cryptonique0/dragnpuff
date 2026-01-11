@@ -70,7 +70,7 @@ contract Governance is Ownable, Pausable {
     event ProposalCancelled(uint256 id);
     event ProposalExecuted(uint256 id);
 
-    constructor(address _governanceToken) Ownable(msg.sender) {
+    constructor(address _governanceToken) {
         governanceToken = IERC20(_governanceToken);
     }
 

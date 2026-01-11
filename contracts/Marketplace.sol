@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
  * @title Marketplace
@@ -53,7 +53,7 @@ contract Marketplace is Ownable, ReentrancyGuard {
     event OfferMade(uint256 indexed offerId, address indexed buyer, address nftContract, uint256 tokenId, uint256 amount);
     event OfferAccepted(uint256 indexed offerId);
 
-    constructor(address _platformFeeRecipient) Ownable(msg.sender) {
+    constructor(address _platformFeeRecipient) {
         platformFeeRecipient = _platformFeeRecipient;
     }
 

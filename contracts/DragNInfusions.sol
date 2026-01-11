@@ -96,7 +96,6 @@ contract DragNInfusions is Ownable, ReentrancyGuard, EIP712 {
 
     // Constructor
     constructor(address _dragNContract, address _nomToken) 
-        Ownable(msg.sender) 
         EIP712("DragNInfusions", "1") 
     {
         dragNContract = IERC721(_dragNContract);
