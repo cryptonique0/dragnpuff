@@ -439,16 +439,23 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
 }
 
 .rarity-pill {
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-full);
-  border: 1px solid var(--color-gray);
-  background-color: var(--color-white);
-  font-size: var(--font-xs);
+  border: 1px solid rgba(0,0,0,0.08);
+  background-color: var(--color-gray-light);
+  font-size: var(--font-sm);
   font-weight: 700;
 }
+
+.rarity-pill.rarity-legendary { background: linear-gradient(135deg, #ffb347, #ffcc33); color: #3b2b00; }
+.rarity-pill.rarity-epic { background: linear-gradient(135deg, #b47cff, #8a63ff); color: #f7f2ff; }
+.rarity-pill.rarity-rare { background: linear-gradient(135deg, #4da1ff, #3278ff); color: #f0f6ff; }
+.rarity-pill.rarity-uncommon { background: linear-gradient(135deg, #5ad18a, #37b56b); color: #062d18; }
+.rarity-pill.rarity-common { background: linear-gradient(135deg, #d9d9d9, #bfbfbf); color: #1f1f1f; }
 
 .metadata-window {
   display: grid;

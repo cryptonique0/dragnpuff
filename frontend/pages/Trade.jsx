@@ -94,6 +94,7 @@ const buildTraitOptions = (items) => {
 const Trade = () => {
   const [tokensWindow, setTokensWindow] = useState({ start: 1, count: 18 });
   const [nfts, setNfts] = useState([]);
+  const [metadataCache, setMetadataCache] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [traitOptions, setTraitOptions] = useState({});
@@ -106,23 +107,48 @@ const Trade = () => {
     activeTraits: [],
   });
 
-  const { data: floorData } = useApi('/api/marketplace/floor-price', {});
-  const { data: volumeData } = useApi('/api/marketplace/volume', {});
+  const { data: floorData, loading: floorLoading } = useApi('/api/marketplace/floor-price', {});
+  const { data: volumeData, loading: volumeLoading } = useApi('/api/marketplace/volume', {});
+
+  const cacheWindow = useCallback((items) => {
+    setMetadataCache((prev) => {
+      const next = { ...prev };
+      items.forEach((item) => {
+        if (item?.tokenId) next[item.tokenId] = item;
+      });
+      return next;
+    });
+  }, []);
+
+  const fetchWindow = useCallback(async (start, count) => {
+    const tokenIds = Array.from({ length: count }, (_, idx) => start + idx);
+    const missing = tokenIds.filter((id) => !metadataCache[id]);
+    let fetchedMap = {};
+    if (missing.length) {
+      const fetched = await Promise.all(missing.map((id) => fetchMetadata(id)));
+      fetchedMap = Object.fromEntries(fetched.filter(Boolean).map((m) => [m.tokenId, m]));
+      cacheWindow(Object.values(fetchedMap));
+    }
+    const merged = tokenIds.map((id) => fetchedMap[id] || metadataCache[id]).filter(Boolean);
+    return merged;
+  }, [metadataCache, cacheWindow]);
 
   const loadWindow = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const tokenIds = Array.from({ length: tokensWindow.count }, (_, idx) => tokensWindow.start + idx);
-      const results = await Promise.all(tokenIds.map((id) => fetchMetadata(id)));
-      setNfts(results.filter(Boolean));
+      const results = await fetchWindow(tokensWindow.start, tokensWindow.count);
+      setNfts(results);
       setTraitOptions(buildTraitOptions(results));
+      // Prefetch next two windows for faster UX
+      fetchWindow(tokensWindow.start + tokensWindow.count, tokensWindow.count).catch(() => {});
+      fetchWindow(tokensWindow.start + tokensWindow.count * 2, tokensWindow.count).catch(() => {});
     } catch (err) {
       setError(err.message || 'Failed to load metadata');
     } finally {
       setLoading(false);
     }
-  }, [tokensWindow]);
+  }, [tokensWindow, fetchWindow]);
 
   useEffect(() => {
     loadWindow();
@@ -235,7 +261,7 @@ const Trade = () => {
         <div className="stat-grid">
           <div className="stat-card">
             <div className="label">Floor (API or est.)</div>
-            <div className="value">{displayedFloor ? `${displayedFloor} ETH` : '—'}</div>
+            <div className="value">{floorLoading ? '…' : displayedFloor ? `${displayedFloor} ETH` : '—'}</div>
             <div className="subtext">Live /api/marketplace/floor-price with est. fallback</div>
           </div>
           <div className="stat-card">
@@ -244,8 +270,8 @@ const Trade = () => {
             <div className="subtext">{nfts.length} loaded · {Object.keys(traitOptions).length} trait types</div>
           </div>
           <div className="stat-card">
-            <div className="label">Volume (mock)</div>
-            <div className="value">{volumeData?.weekly ? `${volumeData.weekly} ETH` : '—'}</div>
+            <div className="label">Volume (API)</div>
+            <div className="value">{volumeLoading ? '…' : volumeData?.weekly ? `${volumeData.weekly} ETH` : '—'}</div>
             <div className="subtext">Weekly sample from /api/marketplace/volume</div>
           </div>
           <div className="stat-card">
@@ -372,7 +398,7 @@ const Trade = () => {
 
         <div className="rarity-legend">
           {rarityLegend.map((bucket) => (
-            <span key={bucket.key} className="rarity-pill">
+            <span key={bucket.key} className={`rarity-pill rarity-${bucket.key}`}>
               {bucket.label}: {rarityBreakdown[bucket.key]}
             </span>
           ))}

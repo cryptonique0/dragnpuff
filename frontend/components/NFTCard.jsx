@@ -20,11 +20,13 @@ const NFTCard = ({ nft, onBuy, onBid }) => {
     : '—';
   const tokenLabel = nft.tokenId ?? nft.id;
 
+  const rarityKey = nft.rarity?.toLowerCase?.() || 'common';
+
   return (
     <div className="nft-card">
       <div className="nft-card-image">
         <img src={nft.image} alt={nft.name} />
-        <span className="nft-rarity-badge">{nft.rarity}</span>
+        <span className={`nft-rarity-badge rarity-${rarityKey}`}>{nft.rarity}</span>
         {nft.listed && <span className="nft-listed-badge">For Sale</span>}
       </div>
 

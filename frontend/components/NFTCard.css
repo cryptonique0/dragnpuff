@@ -38,14 +38,20 @@
   position: absolute;
   top: var(--spacing-sm);
   right: var(--spacing-sm);
-  background-color: var(--base-blue);
-  color: var(--color-white);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
   font-size: var(--font-xs);
   font-weight: 700;
   text-transform: uppercase;
+  color: var(--color-white);
+  border: 1px solid rgba(0,0,0,0.08);
 }
+
+.nft-rarity-badge.rarity-legendary { background: linear-gradient(135deg, #ffb347, #ffcc33); color: #3b2b00; }
+.nft-rarity-badge.rarity-epic { background: linear-gradient(135deg, #b47cff, #8a63ff); }
+.nft-rarity-badge.rarity-rare { background: linear-gradient(135deg, #4da1ff, #3278ff); }
+.nft-rarity-badge.rarity-uncommon { background: linear-gradient(135deg, #5ad18a, #37b56b); }
+.nft-rarity-badge.rarity-common { background: linear-gradient(135deg, #d9d9d9, #bfbfbf); color: #222; }
 
 .nft-listed-badge {
   position: absolute;
