@@ -39,9 +39,12 @@ async function recordSeasonalScore(fid, houseId, action, basePoints) {
         const seasonId = seasonDoc.id;
         const seasonData = seasonDoc.data();
         
-        // Apply multiplier if exists
-        const multiplier = seasonData.multipliers?.[houseId] || 1.0;
-        const finalPoints = Math.floor(basePoints * multiplier);
+        // Apply configured multiplier and staking boost (if available)
+        const configMultiplier = seasonData.multipliers?.[houseId] || 1.0;
+        const boostMultipliers = await util.getHouseBoostMultipliers();
+        const stakingMultiplier = boostMultipliers?.[houseId] || 1.0;
+        const totalMultiplier = configMultiplier * stakingMultiplier;
+        const finalPoints = Math.floor(basePoints * totalMultiplier);
         
         // Update house score
         const houseScoreRef = db.collection("seasons").doc(seasonId)

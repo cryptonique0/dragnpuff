@@ -15,6 +15,15 @@ const ethers = require("ethers");
 const {PubSub} = require("@google-cloud/pubsub");
 const pubsub = new PubSub();
 
+// Staking boost lookup (on-chain)
+const STAKING_ADDRESS = process.env.STAKING_CONTRACT || process.env.NOM_STAKING_CONTRACT;
+const STAKING_ABI = [
+    "function getHouseBoost(uint8 _houseId) view returns (uint256)"
+];
+const HOUSE_COUNT = 7;
+const boostCache = { ts: 0, boosts: null };
+const BOOST_TTL_MS = 5 * 60 * 1000;
+
 const DragNPuffJSON = require("./abis/DragNPuff.json");
 const MinterJSON = require("./abis/ERC721Minter.json");
 const erc20JSON = require("./abis/IERC20.json");
@@ -112,6 +121,34 @@ module.exports = {
             "Background"
         ]
     }, // houses
+
+    "getHouseBoostMultipliers": async function() {
+        if (!STAKING_ADDRESS || !process.env.API_URL_BASE) {
+            return null;
+        }
+
+        const now = Date.now();
+        if (boostCache.boosts && now - boostCache.ts < BOOST_TTL_MS) {
+            return boostCache.boosts;
+        }
+
+        try {
+            const provider = new ethers.providers.JsonRpcProvider(process.env.API_URL_BASE);
+            const contract = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, provider);
+            const boosts = {};
+            for (let i = 0; i < HOUSE_COUNT; i++) {
+                const bps = await contract.getHouseBoost(i);
+                const asNumber = Number(bps.toString());
+                boosts[i] = asNumber / 10000; // convert bps to multiplier
+            }
+            boostCache.boosts = boosts;
+            boostCache.ts = now;
+            return boosts;
+        } catch (err) {
+            warn("getHouseBoostMultipliers failed", err.message);
+            return null;
+        }
+    },
 
     "houseForFid": function(fid) {
         const util = module.exports;

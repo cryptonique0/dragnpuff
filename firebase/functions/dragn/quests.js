@@ -244,6 +244,28 @@ const claimReward = (state, questId) => {
   return state;
 };
 
+const claimableQuestIds = (state, questId) => {
+  if (questId) {
+    const q = questIndex[questId];
+    if (!q) return [];
+    const periodState = state.periods[q.period];
+    const quest = periodState?.quests?.[questId];
+    if (quest && !quest.claimed && quest.progress >= quest.goal) return [questId];
+    return [];
+  }
+
+  const ids = [];
+  Object.keys(state.periods || {}).forEach((period) => {
+    const quests = state.periods[period].quests || {};
+    Object.entries(quests).forEach(([id, details]) => {
+      if (!details.claimed && details.progress >= details.goal) {
+        ids.push(id);
+      }
+    });
+  });
+  return ids;
+};
+
 module.exports = {
   QUEST_DEFINITIONS,
   async getUserQuests({ userId, address }) {
@@ -277,8 +299,17 @@ module.exports = {
   async claimQuest({ userId, address, questId }) {
     const { docRef, state } = await loadState({ userId, address });
     const merged = mergeDefinitions(state);
-    const claimed = claimReward(merged, questId);
-    await persistState(docRef, claimed);
-    return toClientPayload(claimed);
+
+    if (address) {
+      const lower = address.toLowerCase();
+      if (!merged.addresses.includes(lower)) {
+        merged.addresses.push(lower);
+      }
+    }
+
+    const idsToClaim = claimableQuestIds(merged, questId);
+    idsToClaim.forEach((id) => claimReward(merged, id));
+    await persistState(docRef, merged);
+    return toClientPayload(merged);
   },
 };

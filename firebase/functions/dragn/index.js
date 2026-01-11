@@ -116,6 +116,69 @@ const util = require("./util");
 const actions = require("./actions");
 const quests = require("./quests");
 
+const questFrameIdentity = (req) => {
+  const fid = req.body?.untrustedData?.fid || req.query?.fid || req.body?.fid;
+  const address = req.body?.untrustedData?.address || req.query?.address || req.body?.address;
+  return { fid: fid ? fid.toString() : null, address };
+};
+
+const questTextFromPayload = (payload, note) => {
+  if (!payload) return "Quest board ready. Tap Refresh with Farcaster to load progress.";
+  const lines = [];
+  const daily = payload.quests.filter((q) => q.period === "daily");
+  const weekly = payload.quests.filter((q) => q.period === "weekly");
+  const claimable = payload.quests.filter((q) => q.claimable);
+  const formatRow = (qs) => qs.map((q) => `${q.title.split(" ")[0]} ${q.progress}/${q.goal}${q.claimed ? " ✓" : q.claimable ? " !" : ""}`).join("  ·  ") || "None";
+  lines.push(`FID ${payload.userId || "unknown"}`);
+  lines.push(`Daily: ${formatRow(daily)}`);
+  lines.push(`Weekly: ${formatRow(weekly)}`);
+  lines.push(`Claimable: ${claimable.length} · XP ${payload.balances?.xp || 0} · NOM ${payload.balances?.nom || 0}`);
+  if (note) lines.push(note);
+  return lines.join("\n");
+};
+
+const renderQuestFrame = async ({ fid, address, claim }) => {
+  let payload = null;
+  let actionNote = "";
+  let claimableBefore = 0;
+  try {
+    if (fid) {
+      let preClaim = null;
+      if (claim) {
+        preClaim = await quests.getUserQuests({ userId: fid, address });
+        claimableBefore = (preClaim.quests || []).filter((q) => q.claimable).length;
+      }
+      payload = claim
+        ? await quests.claimQuest({ userId: fid, address })
+        : await quests.getUserQuests({ userId: fid, address });
+      if (claim) {
+        const before = claimableBefore;
+        const after = (payload?.quests || []).filter((q) => q.claimable).length;
+        actionNote = before > after ? "Rewards claimed" : "Nothing ready to claim yet";
+      }
+    }
+  } catch (err) {
+    actionNote = `Error: ${err.message}`;
+  }
+
+  const text = questTextFromPayload(payload, actionNote);
+  const claimableCount = payload
+    ? Math.max((payload.quests || []).filter((q) => q.claimable).length, claimableBefore)
+    : claimableBefore;
+  const frame = {
+    id: "Quest Board",
+    square: true,
+    postUrl: `https://api.dragnpuff.xyz/api/frames/quests`,
+    image: `https://frm.lol/api/dragnpuff/frimg/bg4/${encodeURIComponent(text)}.png`,
+    buttons: [
+      { label: "Refresh", action: "post" },
+      { label: claimableCount ? `Claim (${claimableCount})` : "Claim", action: "post", postUrl: `https://api.dragnpuff.xyz/api/frames/quests/claim` },
+      { label: "Open Board", action: "link", target: `https://dragnpuff.xyz/quests` }
+    ]
+  };
+  return frame;
+};
+
 const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 };
@@ -302,39 +365,18 @@ api.post(['/api/frames/badges'], async function (req, res) {
 }); // POST /api/frames/badges
 
 // Quest Board frame
-const QUEST_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZTVnczk0c3k5bHF2cTd3enllMGw2d2M5Z2c1ZG1nbWV3a2pod2VsZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/pOZhmE42D1nXW/giphy.gif";
 api.get(['/api/frames/quests', '/quests'], async function (req, res) {
   console.log("start GET /api/frames/quests path", req.path);
-  const frame = {
-    id: "Quest Board",
-    square: true,
-    postUrl: `https://api.dragnpuff.xyz/api/frames/quests`,
-    image: QUEST_GIF,
-    buttons: [
-      { label: "Daily Quests", action: "post" },
-      { label: "Claim XP", action: "post", postUrl: `https://api.dragnpuff.xyz/api/frames/quests/claim` },
-      { label: "Open Board", action: "link", target: `https://dragnpuff.xyz/quests` }
-    ]
-  };
+  const { fid, address } = questFrameIdentity(req);
+  const frame = await renderQuestFrame({ fid, address, claim: false });
   const html = await util.frameHTML(frame);
   res.send(html);
 });
 
 api.post(['/api/frames/quests', '/api/frames/quests/claim'], async function (req, res) {
   console.log("start POST /api/frames/quests path", req.path);
-  const frame = {
-    id: "Quest Board",
-    square: true,
-    imageText: "Daily + Weekly quests ready. Claim XP and $NOM.",
-    postUrl: `https://api.dragnpuff.xyz/api/frames/quests`
-  };
-  frame.image = `https://frm.lol/api/dragnpuff/frimg/bg4/${encodeURIComponent(frame.imageText)}.png`;
-  delete frame.imageText;
-  frame.buttons = [
-    { label: "Refresh", action: "post" },
-    { label: "Claim", action: "post", postUrl: `https://api.dragnpuff.xyz/api/frames/quests/claim` },
-    { label: "Open Board", action: "link", target: `https://dragnpuff.xyz/quests` }
-  ];
+  const { fid, address } = questFrameIdentity(req);
+  const frame = await renderQuestFrame({ fid, address, claim: req.path.endsWith('/claim') });
   const html = await util.frameHTML(frame);
   res.send(html);
 });
@@ -657,6 +699,8 @@ api.get(['/api/frames/seasonal-leaderboard', '/seasonal-leaderboard'], async fun
         .doc(seasonDoc.id)
         .collection("houseScores")
         .get();
+
+      const boostMultipliers = await util.getHouseBoostMultipliers();
       
       const leaderboard = [];
       const houseNames = ["Aqua", "Fire", "Earth", "Air", "Light", "Dark", "Chaos"];
@@ -664,14 +708,18 @@ api.get(['/api/frames/seasonal-leaderboard', '/seasonal-leaderboard'], async fun
       houseScoresSnapshot.forEach(doc => {
         const data = doc.data();
         const houseId = parseInt(doc.id);
-        const multiplier = seasonData.multipliers?.[doc.id] || 1.0;
-        const finalScore = Math.floor(data.score * multiplier);
+        const configMultiplier = seasonData.multipliers?.[doc.id] || 1.0;
+        const stakingMultiplier = boostMultipliers?.[houseId] || 1.0;
+        const totalMultiplier = Number((configMultiplier * stakingMultiplier).toFixed(2));
+        const finalScore = Math.floor(data.score * totalMultiplier);
         
         leaderboard.push({
           houseId: houseId,
           houseName: houseNames[houseId],
           finalScore: finalScore,
-          multiplier: multiplier
+          multiplier: configMultiplier,
+          stakingMultiplier,
+          totalMultiplier
         });
       });
       
@@ -686,7 +734,9 @@ api.get(['/api/frames/seasonal-leaderboard', '/seasonal-leaderboard'], async fun
       frame.imageText = `🏆 SEASON ${seasonDoc.id} 🏆\n${timeRemaining}d remaining\n\n`;
       
       leaderboard.slice(0, 7).forEach((house, index) => {
-        const multiplierText = house.multiplier !== 1.0 ? ` (${house.multiplier}x)` : '';
+        const multiplierText = house.totalMultiplier !== 1.0
+          ? ` (x${house.totalMultiplier}${house.stakingMultiplier && house.stakingMultiplier !== 1.0 ? `; stake x${house.stakingMultiplier.toFixed(2)}` : ''})`
+          : '';
         frame.imageText += `#${index + 1} - ${house.houseName}: ${house.finalScore}${multiplierText}\n`;
       });
       
