@@ -11,18 +11,23 @@ const StakingPanel = ({ userAddress, onStake, onUnstake, onClaim }) => {
     amount: 0,
     apy: 0,
     pendingRewards: 0,
-    lockedUntil: 0
+    lockedUntil: 0,
+    houseBoost: 0,
+    houseId: 0
   });
   const [stakeAmount, setStakeAmount] = useState('');
   const [lockPeriod, setLockPeriod] = useState(30);
+  const [houseId, setHouseId] = useState(0);
 
   useEffect(() => {
     // TODO: Fetch staking data from API
     setStakingData({
-      amount: 5000,
+      amount: 0,
       apy: 12,
-      pendingRewards: 45.5,
-      lockedUntil: Date.now() + 30 * 24 * 60 * 60 * 1000
+      pendingRewards: 0,
+      lockedUntil: Date.now(),
+      houseBoost: 0,
+      houseId: 0
     });
   }, [userAddress]);
 
@@ -31,7 +36,7 @@ const StakingPanel = ({ userAddress, onStake, onUnstake, onClaim }) => {
       alert('Please enter a valid amount');
       return;
     }
-    await onStake(stakeAmount, lockPeriod);
+    await onStake(stakeAmount, lockPeriod, houseId);
     setStakeAmount('');
   };
 
@@ -49,6 +54,10 @@ const StakingPanel = ({ userAddress, onStake, onUnstake, onClaim }) => {
         <div className="stat-box">
           <span className="label">APY</span>
           <span className="value">{stakingData.apy}%</span>
+        </div>
+        <div className="stat-box">
+          <span className="label">House Boost</span>
+          <span className="value">{(stakingData.houseBoost / 100).toFixed(2)}x</span>
         </div>
         <div className="stat-box">
           <span className="label">Pending Rewards</span>
@@ -89,6 +98,12 @@ const StakingPanel = ({ userAddress, onStake, onUnstake, onClaim }) => {
             <option value={90}>90 Days - 10% APY</option>
             <option value={180}>180 Days - 12% APY</option>
             <option value={365}>1 Year - 15% APY</option>
+          </select>
+          <label className="staking-form-label">House</label>
+          <select value={houseId} onChange={(e) => setHouseId(parseInt(e.target.value))}>
+            {[0,1,2,3,4,5,6].map((h) => (
+              <option key={h} value={h}>House {h}</option>
+            ))}
           </select>
           <button className="btn btn-primary" onClick={handleStake}>
             Stake Now

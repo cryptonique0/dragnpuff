@@ -66,6 +66,10 @@
   font-weight: 700;
 }
 
+.stat-box .value {
+  display: block;
+}
+
 .staking-stat-card .subvalue {
   color: var(--color-text-secondary);
   font-size: var(--font-xs);

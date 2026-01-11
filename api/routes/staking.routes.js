@@ -24,7 +24,7 @@ router.get("/info", async (req, res) => {
 router.get("/user/:address", async (req, res) => {
   try {
     const { address } = req.params;
-    const stake = await stakingController.getUserStake(address);
+    const stake = await stakingController.getUserStaking(address);
     res.json({ success: true, data: stake });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -37,7 +37,7 @@ router.get("/user/:address", async (req, res) => {
 router.get("/rewards/:address", async (req, res) => {
   try {
     const { address } = req.params;
-    const rewards = await stakingController.getPendingRewards(address);
+    const rewards = await stakingController.getUserRewards(address);
     res.json({ success: true, data: rewards });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -49,8 +49,7 @@ router.get("/rewards/:address", async (req, res) => {
  */
 router.post("/stake", async (req, res) => {
   try {
-    const { staker, amount } = req.body;
-    const result = await stakingController.stake(staker, amount);
+    const result = await stakingController.stake(req, res);
     res.status(201).json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -62,8 +61,7 @@ router.post("/stake", async (req, res) => {
  */
 router.post("/unstake", async (req, res) => {
   try {
-    const { staker, amount } = req.body;
-    const result = await stakingController.unstake(staker, amount);
+    const result = await stakingController.unstake(req, res);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -75,8 +73,7 @@ router.post("/unstake", async (req, res) => {
  */
 router.post("/claim", async (req, res) => {
   try {
-    const { staker } = req.body;
-    const result = await stakingController.claimRewards(staker);
+    const result = await stakingController.claimRewards(req, res);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -88,8 +85,8 @@ router.post("/claim", async (req, res) => {
  */
 router.get("/rate", async (req, res) => {
   try {
-    const rate = await stakingController.getRewardRate();
-    res.json({ success: true, data: { rate } });
+    const data = await stakingController.getStakingRate(req, res);
+    res.json({ success: true, data });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
