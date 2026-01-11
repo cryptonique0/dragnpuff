@@ -126,6 +126,23 @@
   font-weight: 600;
 }
 
+.nft-card-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.trait-pill {
+  background-color: var(--base-blue-lighter);
+  color: var(--color-black);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  border: 1px solid var(--base-blue);
+}
+
 .nft-card-actions {
   display: flex;
   flex-direction: column;

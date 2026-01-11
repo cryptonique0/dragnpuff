@@ -8,6 +8,17 @@ import './NFTCard.css';
 
 const NFTCard = ({ nft, onBuy, onBid }) => {
   const [showDetails, setShowDetails] = useState(false);
+  const ownerLabel = nft.owner ? `${nft.owner.slice(0, 6)}...` : '—';
+  const collectionLabel = nft.collection || "DragN'Puff";
+  const priceValue = typeof nft.price === 'number' || typeof nft.price === 'string'
+    ? nft.price
+    : null;
+  const primaryTraits = (nft.attributes || []).slice(0, 3);
+  const likesCount = nft.likes ?? 0;
+  const contractLabel = nft.contractAddress
+    ? `${nft.contractAddress.slice(0, 10)}...`
+    : '—';
+  const tokenLabel = nft.tokenId ?? nft.id;
 
   return (
     <div className="nft-card">
@@ -19,25 +30,35 @@ const NFTCard = ({ nft, onBuy, onBid }) => {
 
       <div className="nft-card-content">
         <h3 className="nft-card-title">{nft.name}</h3>
-        <p className="nft-card-collection">{nft.collection}</p>
+        <p className="nft-card-collection">{collectionLabel}</p>
 
-        {nft.listed && (
+        {priceValue !== null && (
           <div className="nft-card-price">
-            <span className="label">Price</span>
-            <span className="value">{nft.price} ETH</span>
+            <span className="label">{nft.listed ? 'Price' : 'Est. Value'}</span>
+            <span className="value">{priceValue} ETH</span>
           </div>
         )}
 
         <div className="nft-card-stats">
           <div className="stat">
             <span className="label">Owner</span>
-            <span className="value">{nft.owner.slice(0, 6)}...</span>
+            <span className="value">{ownerLabel}</span>
           </div>
           <div className="stat">
             <span className="label">Likes</span>
-            <span className="value">{nft.likes}</span>
+            <span className="value">{likesCount}</span>
           </div>
         </div>
+
+        {primaryTraits.length > 0 && (
+          <div className="nft-card-traits">
+            {primaryTraits.map((trait) => (
+              <span key={`${trait.trait_type}-${trait.value}`} className="trait-pill">
+                {trait.trait_type}: {trait.value}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="nft-card-actions">
           {nft.listed && (
@@ -61,8 +82,11 @@ const NFTCard = ({ nft, onBuy, onBid }) => {
         {showDetails && (
           <div className="nft-card-details">
             <p><strong>Description:</strong> {nft.description}</p>
-            <p><strong>Contract:</strong> {nft.contractAddress.slice(0, 10)}...</p>
-            <p><strong>Token ID:</strong> {nft.tokenId}</p>
+            <p><strong>Contract:</strong> {contractLabel}</p>
+            <p><strong>Token ID:</strong> {tokenLabel}</p>
+            {nft.attributes && nft.attributes.length > 0 && (
+              <p><strong>Traits:</strong> {nft.attributes.map(attr => `${attr.trait_type}: ${attr.value}`).join(', ')}</p>
+            )}
           </div>
         )}
       </div>

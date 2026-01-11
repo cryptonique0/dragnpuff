@@ -331,3 +331,143 @@
     flex-direction: column;
   }
 }
+
+/* Trade Page Layout */
+.trade-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+}
+
+.trade-hero {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--spacing-xl);
+  align-items: start;
+  margin-bottom: var(--spacing-xl);
+}
+
+.trade-hero h1 {
+  font-size: var(--font-2xl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.trade-hero p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.trade-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.stat-card {
+  background: linear-gradient(135deg, var(--base-blue-lighter), #ffffff);
+  border: 1px solid var(--base-blue);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-card .label {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.stat-card .value {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--base-blue-dark);
+}
+
+.stat-card .subtext {
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.search-input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-gray);
+  border-radius: var(--radius-md);
+  font-size: var(--font-md);
+}
+
+.active-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.trait-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--base-blue);
+  color: var(--color-white);
+  border-radius: var(--radius-full);
+  font-size: var(--font-xs);
+}
+
+.trait-chip button {
+  background: transparent;
+  border: none;
+  color: var(--color-white);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.rarity-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.rarity-pill {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-gray);
+  background-color: var(--color-white);
+  font-size: var(--font-xs);
+  font-weight: 700;
+}
+
+.metadata-window {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--spacing-sm);
+  align-items: end;
+}
+
+.helper-text {
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+}
+
+@media (max-width: 960px) {
+  .trade-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .trade-page {
+    padding: var(--spacing-lg);
+  }
+}

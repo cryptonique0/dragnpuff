@@ -39,7 +39,7 @@ const useApi = (url, options = {}) => {
 
   useEffect(() => {
     if (options.skip) return;
-    fetchData();
+    fetchData().catch(() => {});
   }, [url, fetchData, options.skip]);
 
   return {
