@@ -97,8 +97,7 @@ router.get("/rate", async (req, res) => {
  */
 router.get("/leaderboard", async (req, res) => {
   try {
-    const { limit = 100 } = req.query;
-    const leaderboard = await stakingController.getLeaderboard(limit);
+    const leaderboard = await stakingController.getLeaderboard(req, res);
     res.json({ success: true, data: leaderboard });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
