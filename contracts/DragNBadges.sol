@@ -35,7 +35,7 @@ contract DragNBadges is ERC721Enumerable, Ownable {
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require(_exists(tokenId), "Nonexistent token");
+        require(_ownerOf(tokenId) != address(0), "Nonexistent token");
         uint8 b = uint8(_badgeTypeOf[tokenId]);
         string memory base = _badgeURIs[b];
         return bytes(base).length > 0 ? base : "";
@@ -43,14 +43,14 @@ contract DragNBadges is ERC721Enumerable, Ownable {
 
     function hasBadge(address account, BadgeType badge) public view returns (bool) {
         uint256 tokenId = _makeTokenId(account, badge);
-        return _exists(tokenId);
+        return _ownerOf(tokenId) != address(0);
     }
 
     function awardBadge(address to, BadgeType badge) external onlyOwner returns (uint256) {
         require(to != address(0), "Invalid address");
         require(badge != BadgeType.Unknown, "Invalid badge");
         uint256 tokenId = _makeTokenId(to, badge);
-        require(!_exists(tokenId), "Already awarded");
+        require(_ownerOf(tokenId) == address(0), "Already awarded");
         _safeMint(to, tokenId);
         _badgeTypeOf[tokenId] = badge;
         emit BadgeAwarded(to, tokenId, badge);
