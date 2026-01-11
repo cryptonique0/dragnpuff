@@ -25,6 +25,11 @@ const repCache = new Map();
 const ipHits = new Map();
 const fidHits = new Map();
 const abuseStats = { limited: 0, reputationBlocks: 0 };
+const recentBlocks = [];
+const recordBlock = (entry) => {
+  recentBlocks.push({ ...entry, ts: nowMs() });
+  while (recentBlocks.length > 10) recentBlocks.shift();
+};
 
 const nowMs = () => Date.now();
 const sweep = (bucket, now) => {
@@ -80,6 +85,7 @@ async function reputationGuard(req, res, next) {
     repCache.set(fid, { ok, ts: now });
     if (!ok) {
       abuseStats.reputationBlocks += 1;
+      recordBlock({ reason: "reputation", fid, path: req.path });
       return res.status(403).json({ success: false, error: "Reputation too low" });
     }
   } catch (err) {
@@ -96,12 +102,14 @@ function rateGuard(req, res, next) {
   const ip = getClientIp(req);
   if (!hit(ipHits, ip, IP_LIMIT)) {
     abuseStats.limited += 1;
+    recordBlock({ reason: "rate_ip", ip, path: req.path });
     return res.status(429).json({ success: false, error: "Rate limited (ip)" });
   }
 
   const fid = getFid(req);
   if (fid && !hit(fidHits, fid, FID_LIMIT)) {
     abuseStats.limited += 1;
+    recordBlock({ reason: "rate_fid", fid, path: req.path });
     return res.status(429).json({ success: false, error: "Rate limited (fid)" });
   }
 
@@ -268,6 +276,15 @@ api.get(['/api/ops/abuse'], async function (req, res) {
     fidBuckets: fidHits.size,
     limited: abuseStats.limited,
     reputationBlocks: abuseStats.reputationBlocks,
+    topIps: Array.from(ipHits.entries())
+      .map(([ip, arr]) => ({ ip, recent: arr.length }))
+      .sort((a, b) => b.recent - a.recent)
+      .slice(0, 5),
+    topFids: Array.from(fidHits.entries())
+      .map(([fid, arr]) => ({ fid, recent: arr.length }))
+      .sort((a, b) => b.recent - a.recent)
+      .slice(0, 5),
+    recentBlocks: [...recentBlocks],
   };
   res.json({ success: true, data: snapshot });
 });
