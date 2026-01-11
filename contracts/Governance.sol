@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title Governance
@@ -70,7 +70,7 @@ contract Governance is Ownable, Pausable {
     event ProposalCancelled(uint256 id);
     event ProposalExecuted(uint256 id);
 
-    constructor(address _governanceToken) {
+    constructor(address _governanceToken) Ownable(msg.sender) {
         governanceToken = IERC20(_governanceToken);
     }
 

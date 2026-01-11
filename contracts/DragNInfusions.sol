@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
@@ -96,6 +96,7 @@ contract DragNInfusions is Ownable, ReentrancyGuard, EIP712 {
 
     // Constructor
     constructor(address _dragNContract, address _nomToken) 
+        Ownable(msg.sender) 
         EIP712("DragNInfusions", "1") 
     {
         dragNContract = IERC721(_dragNContract);

@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title Staking
@@ -53,7 +53,7 @@ contract Staking is Ownable, ReentrancyGuard {
     event RewardRateUpdated(uint256 newRate);
     event HouseBoostUpdated(uint8 indexed houseId, uint256 boostBps, uint256 weight);
 
-    constructor(address _stakingToken, address _platformFeeRecipient) {
+    constructor(address _stakingToken, address _platformFeeRecipient) Ownable(msg.sender) {
         stakingToken = IERC20(_stakingToken);
         platformFeeRecipient = _platformFeeRecipient;
     }

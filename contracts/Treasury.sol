@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title Treasury
@@ -47,7 +47,7 @@ contract Treasury is Ownable, ReentrancyGuard {
     event ProposalExecuted(uint256 indexed proposalId);
     event FundsDistributed(address indexed recipient, uint256 amount);
 
-    constructor(address _treasuryToken) {
+    constructor(address _treasuryToken) Ownable(msg.sender) {
         treasuryToken = IERC20(_treasuryToken);
     }
 

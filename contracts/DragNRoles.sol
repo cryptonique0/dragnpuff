@@ -57,7 +57,7 @@ contract DragNRoles is Ownable, EIP712 {
     bytes32 public constant UPDATE_LOADOUT_TYPEHASH =
         keccak256("UpdateLoadout(address user,uint256[] tokenIds,uint256 nonce,uint256 deadline)");
 
-    constructor() EIP712("DragNRoles", "1") {
+    constructor() Ownable(msg.sender) EIP712("DragNRoles", "1") {
         // Initialize default modifiers for each role
         roleModifiers[0] = RoleModifiers(10000, 10000, 10000, 10000); // UNASSIGNED (1x all)
         roleModifiers[1] = RoleModifiers(15000, 8000, 8000, 10000);   // SCOUT (1.5x atk, 0.8x def)
