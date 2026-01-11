@@ -448,6 +448,54 @@ module.exports = {
         }); // return new Promise
       }, // flex
 
+    "recruit": async function(req) {
+        return new Promise(async function(resolve, reject) {
+            await util.validateAirstackREST(req);
+            var frame = {};
+            frame.id = "Recruit Allies";
+            frame.square = true;
+            frame.postUrl = `https://api.dragnpuff.xyz/api/frames/recruit`;
+            var state;
+            if ("state" in req.body.untrustedData) {
+                state = JSON.parse(decodeURIComponent(req.body.untrustedData.state));
+            } else {
+                state = { method: "start" };
+            }
+            const fid = req.body.untrustedData.fid;
+            const frameResult = await util.validate(req);
+            if (frameResult.valid == false) {
+                frame.imageText = "Could not validate frame.";
+                frame.image = `https://frm.lol/api/dragnpuff/frimg/${encodeURIComponent(frame.imageText)}.png`;
+                delete frame.imageText;
+                return resolve(frame);
+            }
+            if (state.method === "start") {
+                frame.imageText = "Recruit allies to your squad\nBoth get buffs and loot";
+                frame.buttons = [
+                    { label: "Recruit", action: "post" },
+                    { label: "Leaderboard", action: "link", target: `https://dragnpuff.xyz/seasonal-leaderboard` }
+                ];
+                state.method = "create";
+            } else if (state.method === "create") {
+                // Generate a recruit link (via cast compose) including referrer fid
+                const recruitText = `Join my DragN squad! Recruit frame: https://dragnpuff.xyz/recruit/${fid}`;
+                frame.imageText = "Share your recruit link\nEarn squad buffs";
+                frame.buttons = [
+                    { label: "Cast It!", action: "link", target: `https://warpcast.com/~/compose?text=${encodeURIComponent(recruitText)}` }
+                ];
+                state.method = "done";
+            } else {
+                frame.imageText = "Recruit complete";
+            }
+            frame.state = state;
+            if ("image" in frame) { /* no-op */ } else {
+                frame.image = `https://frm.lol/api/dragnpuff/frimg/${encodeURIComponent(frame.imageText)}.png`;
+                delete frame.imageText;
+            }
+            return resolve(frame);
+        });
+    }, // recruit
+
     "choose": async function(req) {
         return new Promise(async function(resolve, reject) {
             await util.validateAirstackREST(req);

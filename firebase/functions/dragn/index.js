@@ -204,6 +204,28 @@ api.get(['/api/frames/flex', '/flex'], async function (req, res) {
   res.send(html);
 }); // GET /api/frames/flex
 
+api.get(['/api/frames/recruit', '/recruit'], async function (req, res) {
+  console.log("start GET /api/frames/recruit path", req.path);
+  var frame = {};
+  frame.id = "Recruit Allies";
+  frame.square = true;
+  frame.postUrl = `https://api.dragnpuff.xyz/api/frames/recruit`;
+  frame.image = `https://api.dragnpuff.xyz/img/recruit.png`;
+  frame.buttons = [
+    { label: "Recruit", action: "post" },
+    { label: "Top", action: "link", target: `https://dragnpuff.xyz/seasonal-leaderboard` }
+  ];
+  const html = await util.frameHTML(frame);
+  res.send(html);
+}); // GET /api/frames/recruit
+
+api.post(['/api/frames/recruit'], async function (req, res) {
+  console.log("start POST /api/frames/recruit path", req.path);
+  const frame = await actions.recruit(req);
+  const html = await util.frameHTML(frame);
+  res.send(html);
+}); // POST /api/frames/recruit
+
 api.get(['/api/frames/pixel', '/pixel'], async function (req, res) {
   console.log("start GET /api/frames/pixel path", req.path);
   var frame = {};
