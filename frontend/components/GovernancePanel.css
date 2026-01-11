@@ -1,0 +1,395 @@
+/**
+ * Governance Panel Component Styles - Base Blue Theme
+ */
+
+.governance-panel {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+}
+
+.governance-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.governance-title {
+  color: var(--color-black);
+  font-size: var(--font-3xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.governance-subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-lg);
+}
+
+.governance-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.governance-stat-card {
+  background-color: var(--color-white);
+  border: 2px solid var(--base-blue-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.governance-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--base-blue);
+}
+
+.governance-stat-card .label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.governance-stat-card .value {
+  color: var(--base-blue);
+  font-size: var(--font-2xl);
+  font-weight: 700;
+}
+
+.governance-create-proposal {
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.governance-create-proposal-header {
+  color: var(--color-black);
+  font-size: var(--font-xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 3px solid var(--base-blue);
+}
+
+.governance-form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.governance-form-label {
+  display: block;
+  color: var(--color-black);
+  font-size: var(--font-md);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.governance-form-input,
+.governance-form-textarea {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 2px solid var(--color-gray);
+  border-radius: var(--radius-md);
+  font-size: var(--font-md);
+  color: var(--color-black);
+  background-color: var(--color-white);
+  transition: border-color 0.3s ease;
+  font-family: inherit;
+}
+
+.governance-form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.governance-form-input:focus,
+.governance-form-textarea:focus {
+  outline: none;
+  border-color: var(--base-blue);
+}
+
+.governance-form-help {
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+  margin-top: var(--spacing-xs);
+}
+
+.governance-proposals {
+  margin-top: var(--spacing-2xl);
+}
+
+.governance-proposals-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.governance-proposals-title {
+  color: var(--color-black);
+  font-size: var(--font-2xl);
+  font-weight: 700;
+}
+
+.governance-filter-tabs {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.governance-filter-tab {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 2px solid var(--color-gray);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+  color: var(--color-black);
+  font-size: var(--font-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.governance-filter-tab:hover {
+  border-color: var(--base-blue);
+  color: var(--base-blue);
+}
+
+.governance-filter-tab.active {
+  background-color: var(--base-blue);
+  border-color: var(--base-blue);
+  color: var(--color-white);
+}
+
+.governance-proposal-card {
+  background-color: var(--color-white);
+  border: 2px solid var(--color-gray);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  transition: border-color 0.3s ease;
+}
+
+.governance-proposal-card:hover {
+  border-color: var(--base-blue);
+  box-shadow: var(--shadow-md);
+}
+
+.governance-proposal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: var(--spacing-md);
+}
+
+.governance-proposal-title {
+  color: var(--color-black);
+  font-size: var(--font-xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+}
+
+.governance-proposal-id {
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+}
+
+.governance-proposal-status {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-sm);
+  font-weight: 600;
+}
+
+.governance-proposal-status.active {
+  background-color: var(--color-success);
+  color: var(--color-white);
+}
+
+.governance-proposal-status.passed {
+  background-color: var(--base-blue);
+  color: var(--color-white);
+}
+
+.governance-proposal-status.failed {
+  background-color: var(--color-error);
+  color: var(--color-white);
+}
+
+.governance-proposal-status.pending {
+  background-color: var(--color-warning);
+  color: var(--color-white);
+}
+
+.governance-proposal-description {
+  color: var(--color-text);
+  font-size: var(--font-md);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-lg);
+}
+
+.governance-proposal-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--base-blue-lighter);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.governance-proposal-meta-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.governance-proposal-meta-item .label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.governance-proposal-meta-item .value {
+  color: var(--color-black);
+  font-size: var(--font-md);
+  font-weight: 600;
+}
+
+.governance-voting-section {
+  margin-top: var(--spacing-lg);
+}
+
+.governance-voting-header {
+  color: var(--color-black);
+  font-size: var(--font-md);
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
+.governance-vote-bars {
+  margin-bottom: var(--spacing-lg);
+}
+
+.governance-vote-bar {
+  margin-bottom: var(--spacing-md);
+}
+
+.governance-vote-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xs);
+}
+
+.governance-vote-bar-label {
+  color: var(--color-black);
+  font-size: var(--font-sm);
+  font-weight: 600;
+}
+
+.governance-vote-bar-value {
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+}
+
+.governance-vote-bar-track {
+  height: 24px;
+  background-color: var(--color-gray-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+}
+
+.governance-vote-bar-fill {
+  height: 100%;
+  background-color: var(--base-blue);
+  transition: width 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: var(--spacing-sm);
+}
+
+.governance-vote-bar-fill.against {
+  background-color: var(--color-error);
+}
+
+.governance-vote-bar-percentage {
+  color: var(--color-white);
+  font-size: var(--font-xs);
+  font-weight: 700;
+}
+
+.governance-vote-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.governance-vote-button {
+  padding: var(--spacing-md);
+  border: 2px solid var(--base-blue);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+  color: var(--base-blue);
+  font-size: var(--font-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.governance-vote-button:hover {
+  background-color: var(--base-blue);
+  color: var(--color-white);
+}
+
+.governance-vote-button.against {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.governance-vote-button.against:hover {
+  background-color: var(--color-error);
+  color: var(--color-white);
+}
+
+.governance-empty-state {
+  text-align: center;
+  padding: var(--spacing-3xl);
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.governance-empty-state .icon {
+  font-size: 64px;
+  color: var(--color-gray);
+  margin-bottom: var(--spacing-md);
+}
+
+.governance-empty-state .message {
+  color: var(--color-text-secondary);
+  font-size: var(--font-lg);
+}
+
+@media (max-width: 768px) {
+  .governance-panel {
+    padding: var(--spacing-lg);
+  }
+
+  .governance-filter-tabs {
+    flex-wrap: wrap;
+  }
+
+  .governance-vote-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .governance-proposals-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+}

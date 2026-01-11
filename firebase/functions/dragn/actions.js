@@ -13,6 +13,7 @@ const {
 const ethers = require("ethers");
 
 const util = require("./util");
+const quests = require("./quests");
 
 module.exports = {
 
@@ -94,6 +95,7 @@ module.exports = {
                             "target": `https://warpcast.com/~/compose?text=${encodeURIComponent(`I just breathed fire on ${targetHouse.name}!`)}&embeds[]=https://dragnpuff.xyz/house/fire/${targetHouse.id}`
                         }
                     ];
+                    await quests.recordEvent({ userId: breatherFid.toString(), questId: "breath_fire" });
                 } // if breatherHouse
             } // if targetHouse
             frame.state = state;
@@ -384,6 +386,7 @@ module.exports = {
               state.index += 1;
             }
           }
+                    await quests.recordEvent({ userId: fid.toString(), questId: "flex_house" });
           frame.state = state;
           return resolve(frame);
         }); // return new Promise

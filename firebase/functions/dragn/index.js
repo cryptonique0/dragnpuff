@@ -16,6 +16,7 @@ const sharp = require("sharp");
 
 const util = require("./util");
 const actions = require("./actions");
+const quests = require("./quests");
 
 const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -84,6 +85,7 @@ module.exports.processReferral = async function(message) {
           },
           { merge: true }
       );
+      await quests.recordEvent({ userId: castFid.toString(), questId: "recruit" });
       const response = await fetch(`https://frm.lol/api/dragns/${castFid}/${round}/${fid}`);
       const referral = await response.json();
       log("referral", referral);
@@ -100,6 +102,40 @@ api.get(['/testing'], async function (req, res) {
   res.json({ message: 'Hello DragNs' });
   //}
 }); // GET /testing
+
+// Quest engine endpoints
+api.get(['/api/quests/:userId'], async function (req, res) {
+  try {
+    const { userId } = req.params;
+    const { address } = req.query;
+    const data = await quests.getUserQuests({ userId, address });
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+api.post(['/api/quests/:userId/progress'], async function (req, res) {
+  try {
+    const { userId } = req.params;
+    const { questId, amount, address } = req.body;
+    const data = await quests.recordEvent({ userId, questId, amount: amount || 1, address });
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+api.post(['/api/quests/:userId/claim'], async function (req, res) {
+  try {
+    const { userId } = req.params;
+    const { questId, address } = req.body;
+    const data = await quests.claimQuest({ userId, questId, address });
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
 
 api.get(['/api/frames/top', '/api/frames/top/:fid'], async function (req, res) {
   console.log("start GET /api/frames/top path", req.path);

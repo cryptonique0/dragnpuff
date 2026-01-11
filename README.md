@@ -40,6 +40,13 @@ Action:
 Result:
 ![Fired](https://dragnpuff.xyz/img/f.gif)
 
+## Quest & Mission Engine
+- **Daily quests**: "Breathe Fire" and "Flex Your House" auto-complete when you use the existing cast action or flex frame.
+- **Weekly quest**: "Recruit Allies" increments on referral events (Pub/Sub) and tracks progress in Firestore.
+- **Rewards**: XP and $NOM balances are stored offchain for now and claimable via the new endpoints.
+- **API**: `GET /api/quests/:userId`, `POST /api/quests/:userId/progress`, `POST /api/quests/:userId/claim`.
+- **Frontend**: The Firebase-hosted app now shows quest progress and claim buttons in the Quest panel.
+
 # How it was built
 All code for DragN'Puff and House of the DragNs was written duing the **Onchain Summer Buildathon** hackathon in June 2024. Artwork for the DragN'Puff NFT collection was mostly completed before the hackathon.
 

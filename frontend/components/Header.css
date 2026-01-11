@@ -1,0 +1,112 @@
+/**
+ * Header Component Styles - Base Blue Theme
+ */
+
+.header {
+  background-color: var(--base-blue);
+  color: var(--color-white);
+  padding: var(--spacing-md) var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 3px solid var(--base-blue-dark);
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-decoration: none;
+}
+
+.header-logo h1 {
+  color: var(--color-white);
+  font-size: var(--font-xl);
+  margin: 0;
+  font-weight: 700;
+}
+
+.header-nav {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+}
+
+.header-nav a {
+  color: var(--color-white);
+  text-decoration: none;
+  font-size: var(--font-md);
+  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+}
+
+.header-nav a:hover {
+  background-color: var(--base-blue-dark);
+  transform: translateY(-2px);
+}
+
+.header-nav a.active {
+  background-color: var(--color-white);
+  color: var(--base-blue);
+}
+
+.header-wallet-button {
+  background-color: var(--color-white);
+  color: var(--base-blue);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 2px solid var(--color-white);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.header-wallet-button:hover {
+  background-color: transparent;
+  color: var(--color-white);
+  transform: scale(1.05);
+}
+
+.header-mobile-menu {
+  display: none;
+  background-color: var(--color-white);
+  color: var(--base-blue);
+  border: none;
+  font-size: var(--font-xl);
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 768px) {
+  .header-nav {
+    display: none;
+  }
+  
+  .header-nav.mobile-open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--base-blue);
+    padding: var(--spacing-lg);
+    border-top: 2px solid var(--base-blue-dark);
+  }
+  
+  .header-mobile-menu {
+    display: block;
+  }
+}

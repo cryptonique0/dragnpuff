@@ -22,6 +22,7 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 //import nftJson from './DragNPuff.json';
 import minterJson from './ERC721Minter.json';
 import erc20Json from './IERC20.json';
+import QuestPanel from './QuestPanel';
 //import { m, motion } from 'framer-motion';
 //import { css } from '@emotion/react';
 
@@ -217,6 +218,8 @@ function App() {
           </Link>
         </Text>
       )}
+
+      <QuestPanel />
 
     </Container>
     

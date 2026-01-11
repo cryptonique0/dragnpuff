@@ -1,0 +1,276 @@
+/**
+ * Staking Panel Component Styles - Base Blue Theme
+ */
+
+.staking-panel {
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-xl);
+}
+
+.staking-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 3px solid var(--base-blue);
+}
+
+.staking-panel-title {
+  color: var(--color-black);
+  font-size: var(--font-2xl);
+  font-weight: 700;
+}
+
+.staking-panel-badge {
+  background-color: var(--base-blue);
+  color: var(--color-white);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-sm);
+  font-weight: 600;
+}
+
+.staking-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.staking-stat-card {
+  background: linear-gradient(135deg, var(--base-blue-lighter) 0%, var(--color-white) 100%);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--base-blue-light);
+  transition: transform 0.3s ease;
+}
+
+.staking-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.staking-stat-card .label {
+  color: var(--color-black);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+}
+
+.staking-stat-card .value {
+  color: var(--base-blue);
+  font-size: var(--font-2xl);
+  font-weight: 700;
+}
+
+.staking-stat-card .subvalue {
+  color: var(--color-text-secondary);
+  font-size: var(--font-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.staking-form {
+  background-color: var(--base-blue-lighter);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.staking-form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.staking-form-label {
+  display: block;
+  color: var(--color-black);
+  font-size: var(--font-md);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.staking-form-input {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 2px solid var(--color-gray);
+  border-radius: var(--radius-md);
+  font-size: var(--font-md);
+  color: var(--color-black);
+  background-color: var(--color-white);
+  transition: border-color 0.3s ease;
+}
+
+.staking-form-input:focus {
+  outline: none;
+  border-color: var(--base-blue);
+}
+
+.staking-form-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-sm);
+}
+
+.staking-form-info .balance {
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+}
+
+.staking-form-info .max-button {
+  background-color: var(--base-blue);
+  color: var(--color-white);
+  border: none;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-xs);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.staking-form-info .max-button:hover {
+  background-color: var(--base-blue-dark);
+}
+
+.staking-form-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.staking-positions {
+  margin-top: var(--spacing-xl);
+}
+
+.staking-positions-header {
+  color: var(--color-black);
+  font-size: var(--font-xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--color-gray);
+}
+
+.staking-position-item {
+  background-color: var(--color-white);
+  border: 2px solid var(--color-gray);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  transition: border-color 0.3s ease;
+}
+
+.staking-position-item:hover {
+  border-color: var(--base-blue);
+}
+
+.staking-position-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.staking-position-amount {
+  color: var(--base-blue);
+  font-size: var(--font-xl);
+  font-weight: 700;
+}
+
+.staking-position-apy {
+  background-color: var(--color-success);
+  color: var(--color-white);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-sm);
+  font-weight: 600;
+}
+
+.staking-position-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.staking-position-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.staking-position-detail .label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.staking-position-detail .value {
+  color: var(--color-black);
+  font-size: var(--font-md);
+  font-weight: 600;
+}
+
+.staking-position-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.staking-empty-state {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--color-text-secondary);
+}
+
+.staking-empty-state p {
+  font-size: var(--font-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.staking-rewards-banner {
+  background: linear-gradient(135deg, var(--base-blue) 0%, var(--base-blue-dark) 100%);
+  color: var(--color-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.staking-rewards-banner .title {
+  font-size: var(--font-sm);
+  margin-bottom: var(--spacing-sm);
+  opacity: 0.9;
+}
+
+.staking-rewards-banner .amount {
+  font-size: var(--font-3xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.staking-rewards-banner .btn {
+  background-color: var(--color-white);
+  color: var(--base-blue);
+  border: none;
+}
+
+.staking-rewards-banner .btn:hover {
+  background-color: var(--base-blue-lighter);
+}
+
+@media (max-width: 768px) {
+  .staking-panel {
+    padding: var(--spacing-lg);
+  }
+
+  .staking-form-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .staking-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
