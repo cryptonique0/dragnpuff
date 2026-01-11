@@ -304,7 +304,12 @@ module.exports = {
                             "username": state.username,
                             "tokenId": state.tokenId
                         });
-                      } catch (e) {
+                                                // Award first-mint badge
+                                                try {
+                                                    const achievements = require('./achievements');
+                                                    await achievements.awardFirstMint({ address: state.address });
+                                                } catch (e) { /* noop */ }
+                                            } catch (e) {
                         frame.imageText = `Mint in progress...`;
                         frame.buttons = [
                           {

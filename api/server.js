@@ -43,6 +43,7 @@ app.use("/api/seasons", require("./routes/season.routes"));
 app.use("/api/roles", require("./routes/roles.routes"));
 app.use("/api/infusions", require("./routes/infusions.routes"));
 app.use("/api/referrals", require("./routes/referrals.routes"));
+app.use("/api/badges", require("./routes/badges.routes"));
 
 // Error handling
 app.use((err, req, res, next) => {

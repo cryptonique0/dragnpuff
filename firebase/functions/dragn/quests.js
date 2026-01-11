@@ -261,6 +261,16 @@ module.exports = {
       }
     }
     const updated = applyProgress(merged, questId, amount);
+    // Achievements: 10 fire breaths badge
+    try {
+      if (questId === 'breath_fire') {
+        const progress = updated.periods['daily'].quests['breath_fire'].progress;
+        const achievements = require('./achievements');
+        if (address) {
+          await achievements.maybeAwardBreathFire10({ fid: userId, address, progress });
+        }
+      }
+    } catch (e) { /* noop */ }
     await persistState(docRef, updated);
     return toClientPayload(updated);
   },

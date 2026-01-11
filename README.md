@@ -96,6 +96,34 @@ Strategic role assignments for DragNs provide gameplay depth and player choice:
 - **Documentation**: See [HOUSE_ROLES.md](docs/HOUSE_ROLES.md) for complete technical details
 
 ## DragN Infusions & Charm System
+-## Referral & Squad Play
+Recruit allies via frames and cast actions. Both referrer and referee receive buffs or loot upon successful, signed referral events.
+
+- **Proofs**: Signed frame payloads verified and stored in Firestore
+- **Buffs/Loot**: Granted to both parties and tracked on-chain/offchain roadmap
+- **Squads**: Aggregated member lists, buffs, and loot for each referrer
+- **API Endpoints**:
+  - `POST /api/referrals/submit` — Submit referral proof
+  - `GET /api/referrals/user/:fid` — User referral stats
+  - `GET /api/referrals/squad/:referrerFid` — Squad view
+  - `GET /api/referrals/leaderboard` — Top recruiters
+  - `POST /api/referrals/redeem` — Redeem buffs/loot
+- **Frame**: Recruit frame added to Firebase functions
+- **Frontend**: Squad view component + referrals hook
+- **Docs**: See [docs/REFERRALS_SQUADS.md](docs/REFERRALS_SQUADS.md)
+
+## Achievements & Badges (Soulbound)
+Non-transferable badges for milestones, displayed in profile and frames.
+
+- **Contract**: Soulbound ERC721 at `contracts/DragNBadges.sol`
+- **Milestones**: First Mint, 10 Fire Breaths, Season Top-10
+- **API**:
+  - `GET /api/badges/types`
+  - `GET /api/badges/user/:address`
+  - `POST /api/badges/award`
+- **Frames**: `/api/frames/badges` basic view
+- **Frontend**: `BadgesPanel` component + `useBadges` hook
+- **Docs**: See [docs/ACHIEVEMENTS_BADGES.md](docs/ACHIEVEMENTS_BADGES.md)
 Upgrade your DragNs with charms and trait modifications, creating repeatable sinks for $NOM tokens:
 
 - **Charm System**: Attach cosmetic and gameplay charms to your DragNs

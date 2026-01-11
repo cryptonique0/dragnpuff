@@ -169,6 +169,32 @@ api.get(['/api/frames/top', '/api/frames/top/:fid'], async function (req, res) {
   res.send(html);
 }); // GET /api/frames/top
 
+api.get(['/api/frames/badges', '/badges'], async function (req, res) {
+  console.log("start GET /api/frames/badges path", req.path);
+  var frame = {};
+  frame.id = "Your Badges";
+  frame.square = true;
+  frame.postUrl = `https://api.dragnpuff.xyz/api/frames/badges`;
+  frame.image = `https://api.dragnpuff.xyz/img/badges.png`;
+  frame.buttons = [
+    { label: "View", action: "post" },
+    { label: "Recruit", action: "link", target: `https://dragnpuff.xyz/recruit` }
+  ];
+  const html = await util.frameHTML(frame);
+  res.send(html);
+}); // GET /api/frames/badges
+
+api.post(['/api/frames/badges'], async function (req, res) {
+  console.log("start POST /api/frames/badges path", req.path);
+  // Simple echo frame; further implementation can fetch badges by address
+  var frame = { id: 'Your Badges', square: true };
+  frame.imageText = "Badges coming in hot!";
+  frame.image = `https://frm.lol/api/dragnpuff/frimg/${encodeURIComponent(frame.imageText)}.png`;
+  delete frame.imageText;
+  const html = await util.frameHTML(frame);
+  res.send(html);
+}); // POST /api/frames/badges
+
 api.post(['/api/frames/mint'], async function (req, res) {
   console.log("start POST /api/frames/mint path", req.path);
   const frame = await actions.mint(req);
