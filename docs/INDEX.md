@@ -17,6 +17,10 @@
 - [API Reference](./API.md) - API endpoints and usage
 - [Security Policy](../SECURITY.md) - Security guidelines
 
+### Game Features
+- [Seasonal Wars](./SEASONAL_WARS.md) - Complete seasonal competition system
+- [Seasonal Wars Quick Start](./SEASONAL_WARS_QUICKSTART.md) - Quick reference guide
+
 ### Helpful Resources
 - [Troubleshooting](./TROUBLESHOOTING.md) - Common issues and solutions
 - [FAQ](./FAQ.md) - Frequently asked questions

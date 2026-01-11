@@ -7,6 +7,7 @@ House of the DragNs is a Farcaster-first social game on Base, featuring generati
 - Mint: https://warpcast.com/markcarey/0x119a419a (mint via web page at https://dragnpuff.xyz/web)
 - Choose: https://warpcast.com/nomadicframe/0xc9895511
 - Leaderboard: https://warpcast.com/markcarey/0xe5071a30
+- Seasonal Wars: https://dragnpuff.xyz/seasonal-leaderboard
 - Breath Fire: https://warpcast.com/markcarey/0xf6664e07
 
 # About
@@ -24,6 +25,7 @@ The House of the DragNs game takes place on the Farcaster decentralized social p
 ![Choose](https://dragnpuff.xyz/img/screen-choose.png)
 - *Leaderboard Frame*. Lists the 7 Houses of the DragN with the strength scores for each.
 ![Leaders](https://dragnpuff.xyz/img/screen-leaderboard.png)
+- *Seasonal Wars Leaderboard*. Shows the current season standings with time remaining and prize pools. Players can toggle between all-time and seasonal leaderboards.
 - *Houses Frames*. Enable the players to flex/share their pledged House.
 ![House](https://dragnpuff.xyz/img/screen-choice.png)
 - *Dragn x Pixel Frame*. A limited time frame and mini affiliate program that rewarded DragN mint referrals with Pixel Nouns NFTs on Degen chain.
@@ -46,6 +48,29 @@ Result:
 - **Rewards**: XP and $NOM balances are stored offchain for now and claimable via the new endpoints.
 - **API**: `GET /api/quests/:userId`, `POST /api/quests/:userId/progress`, `POST /api/quests/:userId/claim`.
 - **Frontend**: The Firebase-hosted app now shows quest progress and claim buttons in the Quest panel.
+
+## Seasonal House Wars
+Time-bounded competitive seasons pit the 7 Houses against each other for glory and prizes:
+
+- **Season Structure**: Each season runs for 30 days with a defined start and end time
+- **Scoring System**: Houses earn points through player actions:
+  - Breathe Fire: 15 points
+  - Flex House: 5 points
+  - Recruit Allies: 10 points
+  - Cast Engagement: 3 points
+- **Multipliers**: Dynamic multipliers (up to 5x) can be applied to Houses based on special events or achievements
+- **Prize Pools**: ETH prize pools distributed to top 3 Houses (50% / 30% / 20% split)
+- **Leaderboards**: 
+  - All-time leaderboard tracks cumulative House strength
+  - Seasonal leaderboard shows current season standings with real-time updates
+  - Frame integration allows easy switching between views
+- **Smart Contract**: `SeasonalWars.sol` tracks scores on-chain with event emissions for transparency
+- **API Endpoints**: 
+  - `GET /api/seasons/current` - Get active season info
+  - `GET /api/seasons/:seasonId/leaderboard` - View season standings
+  - `GET /api/seasons/:seasonId/house/:houseId` - House-specific stats
+  - `POST /api/seasons/create` - Start new season (admin)
+  - `POST /api/seasons/multiplier` - Update multipliers (admin)
 
 # How it was built
 All code for DragN'Puff and House of the DragNs was written duing the **Onchain Summer Buildathon** hackathon in June 2024. Artwork for the DragN'Puff NFT collection was mostly completed before the hackathon.

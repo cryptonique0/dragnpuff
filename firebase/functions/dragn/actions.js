@@ -15,6 +15,60 @@ const ethers = require("ethers");
 const util = require("./util");
 const quests = require("./quests");
 
+/**
+ * Record seasonal score for a house
+ */
+async function recordSeasonalScore(fid, houseId, action, basePoints) {
+    try {
+        const db = getFirestore();
+        const seasonsRef = db.collection("seasons");
+        
+        // Get current active season
+        const activeSeasonSnapshot = await seasonsRef
+            .where("active", "==", true)
+            .where("endTime", ">", new Date())
+            .limit(1)
+            .get();
+        
+        if (activeSeasonSnapshot.empty) {
+            log("No active season found");
+            return;
+        }
+        
+        const seasonDoc = activeSeasonSnapshot.docs[0];
+        const seasonId = seasonDoc.id;
+        const seasonData = seasonDoc.data();
+        
+        // Apply multiplier if exists
+        const multiplier = seasonData.multipliers?.[houseId] || 1.0;
+        const finalPoints = Math.floor(basePoints * multiplier);
+        
+        // Update house score
+        const houseScoreRef = db.collection("seasons").doc(seasonId)
+            .collection("houseScores").doc(houseId.toString());
+        
+        await houseScoreRef.set({
+            houseId: houseId,
+            score: FieldValue.increment(finalPoints),
+            lastUpdated: new Date()
+        }, { merge: true });
+        
+        // Log individual action
+        await db.collection("seasons").doc(seasonId)
+            .collection("actions").add({
+                fid: fid,
+                houseId: houseId,
+                action: action,
+                points: finalPoints,
+                timestamp: new Date()
+            });
+        
+        log(`Seasonal score recorded: Season ${seasonId}, House ${houseId}, +${finalPoints} points`);
+    } catch (err) {
+        error("Error recording seasonal score:", err);
+    }
+}
+
 module.exports = {
 
     "fire": async function(req) {
@@ -95,7 +149,9 @@ module.exports = {
                             "target": `https://warpcast.com/~/compose?text=${encodeURIComponent(`I just breathed fire on ${targetHouse.name}!`)}&embeds[]=https://dragnpuff.xyz/house/fire/${targetHouse.id}`
                         }
                     ];
+                    // Record quest and seasonal score
                     await quests.recordEvent({ userId: breatherFid.toString(), questId: "breath_fire" });
+                    await recordSeasonalScore(breatherFid, breatherHouse.id, "fire", 15);
                 } // if breatherHouse
             } // if targetHouse
             frame.state = state;

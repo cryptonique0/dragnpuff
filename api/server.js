@@ -39,6 +39,7 @@ app.use("/api/marketplace", require("./routes/marketplace.routes"));
 app.use("/api/staking", require("./routes/staking.routes"));
 app.use("/api/governance", require("./routes/governance.routes"));
 app.use("/api/user", require("./routes/user.routes"));
+app.use("/api/seasons", require("./routes/season.routes"));
 
 // Error handling
 app.use((err, req, res, next) => {

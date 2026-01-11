@@ -339,6 +339,11 @@ api.get(['/api/frames/leaderboard', '/leaderboard'], async function (req, res) {
       "postUrl": "https://api.dragnpuff.xyz/api/frames/choose"
     },
     {
+      "label": "Seasonal",
+      "action": "post",
+      "postUrl": "https://api.dragnpuff.xyz/api/frames/seasonal-leaderboard"
+    },
+    {
       "label": "Mint",
       "action": "post",
       "postUrl": "https://api.dragnpuff.xyz/api/frames/mint" 
@@ -347,6 +352,109 @@ api.get(['/api/frames/leaderboard', '/leaderboard'], async function (req, res) {
   const html = await util.frameHTML(frame);
   res.send(html);
 }); // GET /api/frames/leaderboard
+
+api.get(['/api/frames/seasonal-leaderboard', '/seasonal-leaderboard'], async function (req, res) {
+  console.log("start GET /api/frames/seasonal-leaderboard path", req.path);
+  var frame = {};
+  frame.id = "Seasonal Wars";
+  frame.square = true;
+  frame.postUrl = `https://api.dragnpuff.xyz/api/frames/seasonal-leaderboard`;
+  frame.imageText = '';
+  
+  try {
+    const db = getFirestore();
+    
+    // Get current active season
+    const activeSeasonSnapshot = await db.collection("seasons")
+      .where("active", "==", true)
+      .where("endTime", ">", new Date())
+      .limit(1)
+      .get();
+    
+    if (activeSeasonSnapshot.empty) {
+      frame.imageText = "No active season\n\nStay tuned for the next\nHouse Wars season!";
+      frame.buttons = [
+        { 
+          "label": "All-Time",
+          "action": "post",
+          "postUrl": "https://api.dragnpuff.xyz/api/frames/leaderboard"
+        }
+      ];
+    } else {
+      const seasonDoc = activeSeasonSnapshot.docs[0];
+      const seasonData = seasonDoc.data();
+      
+      // Get house scores
+      const houseScoresSnapshot = await db.collection("seasons")
+        .doc(seasonDoc.id)
+        .collection("houseScores")
+        .get();
+      
+      const leaderboard = [];
+      const houseNames = ["Aqua", "Fire", "Earth", "Air", "Light", "Dark", "Chaos"];
+      
+      houseScoresSnapshot.forEach(doc => {
+        const data = doc.data();
+        const houseId = parseInt(doc.id);
+        const multiplier = seasonData.multipliers?.[doc.id] || 1.0;
+        const finalScore = Math.floor(data.score * multiplier);
+        
+        leaderboard.push({
+          houseId: houseId,
+          houseName: houseNames[houseId],
+          finalScore: finalScore,
+          multiplier: multiplier
+        });
+      });
+      
+      // Sort by final score descending
+      leaderboard.sort((a, b) => b.finalScore - a.finalScore);
+      
+      // Calculate time remaining
+      const endTime = seasonData.endTime.toDate();
+      const now = new Date();
+      const timeRemaining = Math.floor((endTime - now) / 1000 / 60 / 60 / 24);
+      
+      frame.imageText = `🏆 SEASON ${seasonDoc.id} 🏆\n${timeRemaining}d remaining\n\n`;
+      
+      leaderboard.slice(0, 7).forEach((house, index) => {
+        const multiplierText = house.multiplier !== 1.0 ? ` (${house.multiplier}x)` : '';
+        frame.imageText += `#${index + 1} - ${house.houseName}: ${house.finalScore}${multiplierText}\n`;
+      });
+      
+      if (seasonData.prizePool && seasonData.prizePool > 0) {
+        frame.imageText += `\n💰 Prize Pool: ${(seasonData.prizePool / 1e18).toFixed(2)} ETH`;
+      }
+      
+      frame.buttons = [
+        { 
+          "label": "All-Time",
+          "action": "post",
+          "postUrl": "https://api.dragnpuff.xyz/api/frames/leaderboard"
+        },
+        {
+          "label": "Breathe Fire",
+          "action": "post",
+          "postUrl": "https://api.dragnpuff.xyz/api/frames/house/fire"
+        }
+      ];
+    }
+  } catch (err) {
+    error("Error loading seasonal leaderboard:", err);
+    frame.imageText = "Error loading seasonal data\n\nPlease try again later";
+    frame.buttons = [
+      { 
+        "label": "All-Time",
+        "action": "post",
+        "postUrl": "https://api.dragnpuff.xyz/api/frames/leaderboard"
+      }
+    ];
+  }
+  
+  frame.image = `https://frm.lol/api/dragnpuff/frimg/leaderboard/${encodeURIComponent(frame.imageText)}.png`;
+  const html = await util.frameHTML(frame);
+  res.send(html);
+}); // GET /api/frames/seasonal-leaderboard
 
 api.post(['/api/frames/leaderboard', '/leaderboard'], async function (req, res) {
   console.log("start POST /api/frames/leaderboard path", req.path);
