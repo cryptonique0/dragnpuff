@@ -72,6 +72,54 @@ Time-bounded competitive seasons pit the 7 Houses against each other for glory a
   - `POST /api/seasons/create` - Start new season (admin)
   - `POST /api/seasons/multiplier` - Update multipliers (admin)
 
+## House Roles & Loadouts
+Strategic role assignments for DragNs provide gameplay depth and player choice:
+
+- **Role System**: Assign DragNs to specialized roles (Scout, Defender, Support) with unique modifiers
+  - **Scout**: 1.5x attack, 0.8x defense - for aggressive strategies
+  - **Defender**: 0.8x attack, 1.5x defense - for tank strategies
+  - **Support**: 1.5x recruitment - for army building
+- **Loadout Management**: Create battle loadouts with up to 5 DragNs per user
+- **Modifiers**: Role-based action multipliers automatically apply to:
+  - Breathe Fire attacks (Scout bonus applies)
+  - Defense calculations (Defender bonus applies)
+  - Recruitment (Support bonus applies)
+- **Smart Contract**: `DragNRoles.sol` manages role assignments with EIP-712 signature support for gasless transactions
+- **API Endpoints**:
+  - `GET /api/roles/available` - List all available roles
+  - `GET /api/roles/user/:address/loadout` - Get user's loadout
+  - `GET /api/roles/user/:address/dragn/:tokenId` - Get DragN's role
+  - `POST /api/roles/assign` - Assign role to DragN
+  - `POST /api/roles/loadout/update` - Update user's loadout
+  - `GET /api/roles/stats/:address` - Get user's role statistics
+- **Frame**: Role assignment frame allows interactive role selection and loadout management
+- **Documentation**: See [HOUSE_ROLES.md](docs/HOUSE_ROLES.md) for complete technical details
+
+## DragN Infusions & Charm System
+Upgrade your DragNs with charms and trait modifications, creating repeatable sinks for $NOM tokens:
+
+- **Charm System**: Attach cosmetic and gameplay charms to your DragNs
+  - **5 Rarity Tiers**: Common (Tier 1) to Legendary (Tier 5) with scaling costs
+  - **Dynamic Pricing**: Charm costs determined by rarity and ecosystem metrics
+  - **Multiple Charms**: Apply multiple charms to a single DragN for stacked benefits
+- **Trait Upgrades**: Permanently improve DragN attributes by spending $NOM
+  - **Cost Multipliers**: 1x-5x cost scaling based on upgrade power
+  - **Permanent Modifications**: Upgrades persist across seasons and gameplay
+  - **Infusion Score**: Combined score from charms and upgrades determines visual ranking
+- **Gasless Transactions**: EIP-712 signature support eliminates gas fees for users
+- **Smart Contract**: `DragNInfusions.sol` manages charms and upgrades with replay protection
+- **API Endpoints**:
+  - `GET /api/infusions/charms` - List all available charms
+  - `GET /api/infusions/dragn/:tokenId` - Get DragN's infusions
+  - `GET /api/infusions/user/:address` - User's infusion stats
+  - `GET /api/infusions/stats` - Global ecosystem stats
+  - `GET /api/infusions/leaderboard` - Top spenders ranking
+  - `POST /api/infusions/apply-charm` - Apply charm to DragN
+  - `POST /api/infusions/upgrade-trait` - Upgrade a trait
+- **Frame**: Interactive charm browsing and application flow
+- **Leaderboard**: Track top spenders and most infused DragNs
+- **Documentation**: See [DRAGN_INFUSIONS.md](docs/DRAGN_INFUSIONS.md) for complete technical details
+
 # How it was built
 All code for DragN'Puff and House of the DragNs was written duing the **Onchain Summer Buildathon** hackathon in June 2024. Artwork for the DragN'Puff NFT collection was mostly completed before the hackathon.
 
