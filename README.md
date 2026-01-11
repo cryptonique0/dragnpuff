@@ -13,6 +13,14 @@ House of the DragNs is a Farcaster-first social game on Base, featuring generati
 # About
 House of the DragNs provides a social gaming experience on Farcaster and Base. Onchain assets include the ERC20 token $NOM and the ERC721 NFT collection DragN'Puff. The NFT collection was deployed to Base Mainnet in June 2024, during the **Onchain Summer Buildathon** hackathon. The high-resolution generative art was created by @nomadicframe and features 111 uniques trait with varying rarities spanning 7 categories. While DragNs can be used as PFPs, they act primarily as a game asset for House of the DragNs, a social game on Farcaster. Players pledge their DragNs to community-themes Houses (teams). Houses compete with each other through social engagement actions, including Farcaster frames, cast actions, casts, and reactions. A Leaderboard frame shows the current strength of the 7 Houses.
 
+## Recent Additions
+- **Marketplace discovery**: Read-only trait-filtered Trade page with rarity surfacing and floor/volume readouts; uses existing metadata URIs and DragN cards for quick browsing.
+- **House staking boosts**: Time-locked $NOM staking to a house with lock-weighted multipliers and seasonal scoring hooks (staking boosts flow into Seasonal Wars multipliers).
+- **Achievements & Badges**: Soulbound badge contract and Badges panel/frame to display milestones (first mint, 10 fire breaths, season top-10).
+- **New frames**: Quest Board, Season Recap, Squad Status for higher Farcaster engagement with animated shareables.
+- **Anti-abuse & ops**: Per-IP and per-FID rate limits, Neynar reputation checks, and an ops abuse dashboard endpoint (`/api/ops/abuse`).
+- **Badge QA helper**: Run `node scripts/checkBadges.js` with `BASE_URL` and `ADDRESS` to sanity-check badges endpoints and frame HTML.
+
 ## Farcaster Platform
 The House of the DragNs game takes place on the Farcaster decentralized social platform, using social interactions including frames, cast actions, and more.
 
