@@ -13,6 +13,104 @@ const express = require("express");
 const api = express();
 const cors = require("cors");
 const sharp = require("sharp");
+const fetch = require("node-fetch");
+
+api.use(express.json({ limit: "1mb" }));
+
+// Basic anti-abuse heuristics
+const RATE_WINDOW_MS = 60 * 1000;
+const IP_LIMIT = 80; // per minute
+const FID_LIMIT = 40; // per minute
+const repCache = new Map();
+const ipHits = new Map();
+const fidHits = new Map();
+const abuseStats = { limited: 0, reputationBlocks: 0 };
+
+const nowMs = () => Date.now();
+const sweep = (bucket, now) => {
+  for (const [key, entries] of bucket.entries()) {
+    bucket.set(key, entries.filter((t) => now - t < RATE_WINDOW_MS));
+    if (bucket.get(key).length === 0) bucket.delete(key);
+  }
+};
+
+const hit = (bucket, key, limit) => {
+  const now = nowMs();
+  const arr = bucket.get(key) || [];
+  const fresh = arr.filter((t) => now - t < RATE_WINDOW_MS);
+  fresh.push(now);
+  bucket.set(key, fresh);
+  return fresh.length <= limit;
+};
+
+const getClientIp = (req) => {
+  const xf = req.headers["x-forwarded-for"];
+  if (xf) return xf.split(",")[0].trim();
+  return req.headers["fastly-client-ip"] || req.ip || "unknown";
+};
+
+const getFid = (req) => {
+  return req.body?.untrustedData?.fid || req.body?.data?.fid || req.params?.fid || req.query?.fid;
+};
+
+async function reputationGuard(req, res, next) {
+  const fid = getFid(req);
+  if (!fid || !process.env.NEYNAR_API_KEY) return next();
+  const cache = repCache.get(fid);
+  const now = nowMs();
+  if (cache && now - cache.ts < 5 * 60 * 1000) {
+    if (!cache.ok) {
+      abuseStats.reputationBlocks += 1;
+      return res.status(403).json({ success: false, error: "Low reputation" });
+    }
+    return next();
+  }
+
+  try {
+    const resp = await fetch(`https://api.neynar.com/v2/farcaster/user?fid=${fid}`, {
+      headers: { accept: "application/json", api_key: process.env.NEYNAR_API_KEY }
+    });
+    const body = await resp.json();
+    const user = body?.result?.user || {};
+    const score =
+      (user.power_badge ? 1 : 0) +
+      ((user.verifications || []).length > 0 ? 1 : 0) +
+      (user.follower_count > 50 ? 1 : 0);
+    const ok = score >= 1;
+    repCache.set(fid, { ok, ts: now });
+    if (!ok) {
+      abuseStats.reputationBlocks += 1;
+      return res.status(403).json({ success: false, error: "Reputation too low" });
+    }
+  } catch (err) {
+    console.warn("reputationGuard error", err.message);
+  }
+  return next();
+}
+
+function rateGuard(req, res, next) {
+  const now = nowMs();
+  sweep(ipHits, now);
+  sweep(fidHits, now);
+
+  const ip = getClientIp(req);
+  if (!hit(ipHits, ip, IP_LIMIT)) {
+    abuseStats.limited += 1;
+    return res.status(429).json({ success: false, error: "Rate limited (ip)" });
+  }
+
+  const fid = getFid(req);
+  if (fid && !hit(fidHits, fid, FID_LIMIT)) {
+    abuseStats.limited += 1;
+    return res.status(429).json({ success: false, error: "Rate limited (fid)" });
+  }
+
+  return next();
+}
+
+api.use(rateGuard);
+api.use(reputationGuard);
+api.use(cors({ origin: true }));
 
 const util = require("./util");
 const actions = require("./actions");
@@ -93,8 +191,6 @@ module.exports.processReferral = async function(message) {
   }); // return promise
 }; // processReferral
 
-api.use(cors({ origin: true })); // enable origin cors
-
 api.get(['/testing'], async function (req, res) {
   console.log("start GET /testing path", req.path);
   //res.set('Cache-Control', 'public, max-age=60, s-maxage=120');
@@ -102,6 +198,16 @@ api.get(['/testing'], async function (req, res) {
   res.json({ message: 'Hello DragNs' });
   //}
 }); // GET /testing
+
+api.get(['/api/ops/abuse'], async function (req, res) {
+  const snapshot = {
+    ipBuckets: ipHits.size,
+    fidBuckets: fidHits.size,
+    limited: abuseStats.limited,
+    reputationBlocks: abuseStats.reputationBlocks,
+  };
+  res.json({ success: true, data: snapshot });
+});
 
 // Quest engine endpoints
 api.get(['/api/quests/:userId'], async function (req, res) {
@@ -194,6 +300,120 @@ api.post(['/api/frames/badges'], async function (req, res) {
   const html = await util.frameHTML(frame);
   res.send(html);
 }); // POST /api/frames/badges
+
+// Quest Board frame
+const QUEST_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZTVnczk0c3k5bHF2cTd3enllMGw2d2M5Z2c1ZG1nbWV3a2pod2VsZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/pOZhmE42D1nXW/giphy.gif";
+api.get(['/api/frames/quests', '/quests'], async function (req, res) {
+  console.log("start GET /api/frames/quests path", req.path);
+  const frame = {
+    id: "Quest Board",
+    square: true,
+    postUrl: `https://api.dragnpuff.xyz/api/frames/quests`,
+    image: QUEST_GIF,
+    buttons: [
+      { label: "Daily Quests", action: "post" },
+      { label: "Claim XP", action: "post", postUrl: `https://api.dragnpuff.xyz/api/frames/quests/claim` },
+      { label: "Open Board", action: "link", target: `https://dragnpuff.xyz/quests` }
+    ]
+  };
+  const html = await util.frameHTML(frame);
+  res.send(html);
+});
+
+api.post(['/api/frames/quests', '/api/frames/quests/claim'], async function (req, res) {
+  console.log("start POST /api/frames/quests path", req.path);
+  const frame = {
+    id: "Quest Board",
+    square: true,
+    imageText: "Daily + Weekly quests ready. Claim XP and $NOM.",
+    postUrl: `https://api.dragnpuff.xyz/api/frames/quests`
+  };
+  frame.image = `https://frm.lol/api/dragnpuff/frimg/bg4/${encodeURIComponent(frame.imageText)}.png`;
+  delete frame.imageText;
+  frame.buttons = [
+    { label: "Refresh", action: "post" },
+    { label: "Claim", action: "post", postUrl: `https://api.dragnpuff.xyz/api/frames/quests/claim` },
+    { label: "Open Board", action: "link", target: `https://dragnpuff.xyz/quests` }
+  ];
+  const html = await util.frameHTML(frame);
+  res.send(html);
+});
+
+// Season Recap frame
+const SEASON_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmFjcnppNHpmc2txdGN0bnRhNHRoZDA5ajh0YzF3M3ByMWJscW5zayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3oEjI6SIIHBdRxXI40/giphy.gif";
+api.get(['/api/frames/season-recap', '/season-recap'], async function (req, res) {
+  console.log("start GET /api/frames/season-recap path", req.path);
+  const frame = {
+    id: "Season Recap",
+    square: true,
+    postUrl: `https://api.dragnpuff.xyz/api/frames/season-recap`,
+    image: SEASON_GIF,
+    buttons: [
+      { label: "View Recap", action: "post" },
+      { label: "Leaderboard", action: "link", target: `https://dragnpuff.xyz/seasonal-leaderboard` },
+      { label: "Share", action: "link", target: `https://warpcast.com/~/compose?text=${encodeURIComponent('Season recap: DragNs marched. See the highlights.')}\u0026embeds[]=https://dragnpuff.xyz/seasonal-leaderboard` }
+    ]
+  };
+  const html = await util.frameHTML(frame);
+  res.send(html);
+});
+
+api.post(['/api/frames/season-recap'], async function (req, res) {
+  console.log("start POST /api/frames/season-recap path", req.path);
+  const frame = {
+    id: "Season Recap",
+    square: true,
+    imageText: "Season over. Top 3 houses crowned. Claim your rewards.",
+    postUrl: `https://api.dragnpuff.xyz/api/frames/season-recap`
+  };
+  frame.image = `https://frm.lol/api/dragnpuff/frimg/bg2/${encodeURIComponent(frame.imageText)}.png`;
+  delete frame.imageText;
+  frame.buttons = [
+    { label: "Replay", action: "post" },
+    { label: "Leaderboard", action: "link", target: `https://dragnpuff.xyz/seasonal-leaderboard` },
+    { label: "Share", action: "link", target: `https://warpcast.com/~/compose?text=${encodeURIComponent('Season recap: DragNs marched. See the highlights.')}\u0026embeds[]=https://dragnpuff.xyz/seasonal-leaderboard` }
+  ];
+  const html = await util.frameHTML(frame);
+  res.send(html);
+});
+
+// Squad Status frame
+const SQUAD_GIF = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGQxMTM2dDR1NWJ2bjBlMjF2c3Z3eWR0Ynh3Mmx2bWN2dzY2em5lcCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/10LKovKon8DENq/giphy.gif";
+api.get(['/api/frames/squad', '/squad'], async function (req, res) {
+  console.log("start GET /api/frames/squad path", req.path);
+  const frame = {
+    id: "Squad Status",
+    square: true,
+    postUrl: `https://api.dragnpuff.xyz/api/frames/squad`,
+    image: SQUAD_GIF,
+    buttons: [
+      { label: "Refresh", action: "post" },
+      { label: "Recruit", action: "link", target: `https://warpcast.com/~/compose?text=${encodeURIComponent('Join my DragN squad for the next push. All must choose.')}\u0026embeds[]=https://dragnpuff.xyz/recruit` },
+      { label: "Open Squad", action: "link", target: `https://dragnpuff.xyz/squad` }
+    ]
+  };
+  const html = await util.frameHTML(frame);
+  res.send(html);
+});
+
+api.post(['/api/frames/squad'], async function (req, res) {
+  console.log("start POST /api/frames/squad path", req.path);
+  const frame = {
+    id: "Squad Status",
+    square: true,
+    imageText: "Squad ready. Buffs synced. Recruit and march.",
+    postUrl: `https://api.dragnpuff.xyz/api/frames/squad`
+  };
+  frame.image = `https://frm.lol/api/dragnpuff/frimg/bg3/${encodeURIComponent(frame.imageText)}.png`;
+  delete frame.imageText;
+  frame.buttons = [
+    { label: "Refresh", action: "post" },
+    { label: "Recruit", action: "link", target: `https://warpcast.com/~/compose?text=${encodeURIComponent('Join my DragN squad for the next push. All must choose.')}\u0026embeds[]=https://dragnpuff.xyz/recruit` },
+    { label: "Open Squad", action: "link", target: `https://dragnpuff.xyz/squad` }
+  ];
+  const html = await util.frameHTML(frame);
+  res.send(html);
+});
 
 api.post(['/api/frames/mint'], async function (req, res) {
   console.log("start POST /api/frames/mint path", req.path);

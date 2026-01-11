@@ -95,11 +95,20 @@ All responses follow this format:
 | 429 | Rate Limited |
 | 500 | Server Error |
 
-## Rate Limiting
+## Rate Limiting & Anti-Abuse
 
-Rate limits are enforced per IP address:
-- 100 requests per minute for public endpoints
-- 1000 requests per minute for authenticated endpoints
+- Frames and API endpoints enforce per-IP (80/min) and per-FID (40/min) rate limits.
+- Reputation gating via Neynar: requests with a Farcaster fid must have at least one of (power badge, verified address, follower_count > 50). Low-rep fids receive HTTP 403.
+- Ownership proof: reputation check uses Neynar verified addresses; verified eth addresses are required for reputation pass.
+- Errors use HTTP 429 (rate limited) and HTTP 403 (reputation).
+
+### Ops Dashboard
+
+```
+GET /api/ops/abuse
+```
+
+Returns basic abuse metrics (bucket counts and block counters) for operational monitoring.
 
 ## Examples
 

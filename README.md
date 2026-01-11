@@ -32,6 +32,9 @@ The House of the DragNs game takes place on the Farcaster decentralized social p
 ![Pixel](https://dragnpuff.xyz/img/screen-pixel.png)
 - *Breathed Fire Frame*. Players can flex/share when they "breathe fire" on another house (see cast action below)
 ![Fire](https://dragnpuff.xyz/img/screen-fire.png)
+- *Quest Board Frame*. New Farcaster frame with animated quest board art, quick claim, and a direct link to the quests page.
+- *Season Recap Frame*. Animated recap shareable with leaderboard link for wrapping a season and boosting casts.
+- *Squad Status Frame*. Squad-ready shareable to refresh squad buffs and recruit via Warpcast compose links.
 
 ### Cast Actions
 - *Breath Fire*. After installing this cast action, Farcaster users can use it on any cast of other players from opposing Houses, to "breathe fire" on the target house.
