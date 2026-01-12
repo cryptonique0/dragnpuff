@@ -705,4 +705,6 @@ module.exports = {
             frame.image = `https://frm.lol/api/dragnpuff/frimg/${encodeURIComponent(frame.imageText)}.png`;
             delete frame.imageText;
             return resolve(frame);
-};
+        }); // return new Promise
+    } // pixelnounsAirdrop
+}; // module.exports
