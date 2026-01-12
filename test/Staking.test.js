@@ -8,9 +8,8 @@ const THIRTY_DAYS = 30n * SECONDS_IN_DAY;
 async function deployStakingFixture() {
   const [owner, user, other] = await ethers.getSigners();
 
-  const Token = await ethers.getContractFactory("ERC20PresetMinterPauserUpgradeable");
+  const Token = await ethers.getContractFactory("MockERC20");
   const token = await Token.deploy();
-  await token.initialize("Mock NOM", "MNOM", owner.address);
   const stakeAmount = ethers.parseEther("1000000");
   await token.mint(user.address, stakeAmount);
 

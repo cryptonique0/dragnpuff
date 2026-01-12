@@ -59,23 +59,23 @@ contract DragNBadges is ERC721Enumerable, Ownable {
     }
 
     // Soulbound restrictions: disable approvals and transfers
-    function approve(address to, uint256 tokenId) public override(ERC721, IERC721) {
+    function approve(address, uint256) public override(ERC721, IERC721) {
         revert("Soulbound: approvals disabled");
     }
 
-    function setApprovalForAll(address operator, bool approved) public override(ERC721, IERC721) {
+    function setApprovalForAll(address, bool) public override(ERC721, IERC721) {
         revert("Soulbound: approvals disabled");
     }
 
-    function transferFrom(address from, address to, uint256 tokenId) public override(ERC721, IERC721) {
+    function transferFrom(address, address, uint256) public override(ERC721, IERC721) {
         revert("Soulbound: non-transferable");
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId) public override(ERC721, IERC721) {
+    function safeTransferFrom(address, address, uint256) public override(ERC721, IERC721) {
         revert("Soulbound: non-transferable");
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override(ERC721, IERC721) {
+    function safeTransferFrom(address, address, uint256, bytes memory) public override(ERC721, IERC721) {
         revert("Soulbound: non-transferable");
     }
 }
