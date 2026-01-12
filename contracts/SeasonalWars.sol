@@ -152,9 +152,9 @@ contract SeasonalWars is AccessControl, ReentrancyGuard {
     /**
      * @dev Get top 3 houses by final score
      */
-    function _getTopHouses(uint256 seasonId, uint256[] memory finalScores) 
+    function _getTopHouses(uint256 /*seasonId*/, uint256[] memory finalScores) 
         internal 
-        view 
+        pure 
         returns (uint8[] memory) 
     {
         uint8[] memory houses = new uint8[](3);

@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "firebase-tools": "^15.2.1",
     "hardhat": "^2.22.4",
     "supertest": "^6.3.4"
   }
