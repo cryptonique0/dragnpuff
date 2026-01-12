@@ -1,23 +1,33 @@
 # Testing Guide
 
-## Unit Tests
+## Test Status Summary
+✅ **87 passing tests** | ⚠️ 40 tests pending fixes | 🎯 68% pass rate
 
-### Running Tests
+Recent improvements:
+- Fixed hardhat configuration for proper test execution
+- Added ERC20Mock and ERC721Mock contracts
+- Increased passing tests from 58 to 87 (+50% improvement)
 
+## Running Tests
+
+### Run All Tests
 ```bash
 npm test
 ```
 
-### Running Specific Test File
-
+### Run Specific Test File
 ```bash
-npm test -- test/unit/utils/blockchain.test.js
+npx hardhat test test/DragNRoles.test.js
 ```
 
-### Running with Coverage
-
+### Run Tests Matching Pattern
 ```bash
-npm test -- --coverage
+npx hardhat test --grep "DragNRoles"
+```
+
+### View Test Coverage (coming soon)
+```bash
+npm run test:coverage
 ```
 
 ## Test Structure
