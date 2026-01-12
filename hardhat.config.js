@@ -1,7 +1,10 @@
 require("@nomicfoundation/hardhat-toolbox");
 const dot = require('dotenv').config();
 
-const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001";
+// Use proper 32-byte private key for testing (64 hex chars + 0x prefix)
+// In production, this must come from environment variables
+const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+
 // Support both new and legacy env var names for RPC URLs
 const API_URL_BASE = process.env.BASE_RPC_URL || process.env.API_URL_BASE || "https://mainnet.base.org";
 const API_URL_BASESEPOLIA = process.env.BASE_SEPOLIA_RPC_URL || process.env.API_URL_BASESEPOLIA || "https://sepolia.base.org";
