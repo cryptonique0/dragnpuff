@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
@@ -35,7 +36,7 @@ contract DragNBadges is ERC721Enumerable, Ownable {
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require(_ownerOf(tokenId) != address(0), "Nonexistent token");
+        require(_exists(tokenId), "Nonexistent token");
         uint8 b = uint8(_badgeTypeOf[tokenId]);
         string memory base = _badgeURIs[b];
         return bytes(base).length > 0 ? base : "";
@@ -43,14 +44,14 @@ contract DragNBadges is ERC721Enumerable, Ownable {
 
     function hasBadge(address account, BadgeType badge) public view returns (bool) {
         uint256 tokenId = _makeTokenId(account, badge);
-        return _ownerOf(tokenId) != address(0);
+        return _exists(tokenId);
     }
 
     function awardBadge(address to, BadgeType badge) external onlyOwner returns (uint256) {
         require(to != address(0), "Invalid address");
         require(badge != BadgeType.Unknown, "Invalid badge");
         uint256 tokenId = _makeTokenId(to, badge);
-        require(_ownerOf(tokenId) == address(0), "Already awarded");
+        require(!_exists(tokenId), "Already awarded");
         _safeMint(to, tokenId);
         _badgeTypeOf[tokenId] = badge;
         emit BadgeAwarded(to, tokenId, badge);
@@ -58,23 +59,23 @@ contract DragNBadges is ERC721Enumerable, Ownable {
     }
 
     // Soulbound restrictions: disable approvals and transfers
-    function approve(address to, uint256 tokenId) public override {
+    function approve(address to, uint256 tokenId) public override(ERC721, IERC721) {
         revert("Soulbound: approvals disabled");
     }
 
-    function setApprovalForAll(address operator, bool approved) public override {
+    function setApprovalForAll(address operator, bool approved) public override(ERC721, IERC721) {
         revert("Soulbound: approvals disabled");
     }
 
-    function transferFrom(address from, address to, uint256 tokenId) public override {
+    function transferFrom(address from, address to, uint256 tokenId) public override(ERC721, IERC721) {
         revert("Soulbound: non-transferable");
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId) public override {
+    function safeTransferFrom(address from, address to, uint256 tokenId) public override(ERC721, IERC721) {
         revert("Soulbound: non-transferable");
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override {
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override(ERC721, IERC721) {
         revert("Soulbound: non-transferable");
     }
 }

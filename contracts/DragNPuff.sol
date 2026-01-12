@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-// Compatible with OpenZeppelin Contracts ^5.0.0
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -17,7 +16,7 @@ contract DragNPuff is ERC721, IERC4906, Ownable, AccessControl, EIP712, ERC721Vo
 
     constructor(string memory name, string memory symbol, string memory baseUri, address initialOwner)
         ERC721(name, symbol)
-        Ownable(initialOwner)
+        Ownable()
         EIP712(name, "1")
     {
         _baseTokenURI = baseUri;
@@ -26,6 +25,7 @@ contract DragNPuff is ERC721, IERC4906, Ownable, AccessControl, EIP712, ERC721Vo
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MANAGER_ROLE, initialOwner);
         _grantRole(MINTER_ROLE, initialOwner);
+        _transferOwnership(initialOwner);
     }
 
     function _baseURI() internal view override returns (string memory) {
@@ -57,7 +57,7 @@ contract DragNPuff is ERC721, IERC4906, Ownable, AccessControl, EIP712, ERC721Vo
     }
 
     function exists(uint256 tokenId) public view returns (bool) {
-        return _ownerOf(tokenId) != address(0);
+        return _exists(tokenId);
     }
 
     function clock() public view override returns (uint48) {
@@ -80,18 +80,10 @@ contract DragNPuff is ERC721, IERC4906, Ownable, AccessControl, EIP712, ERC721Vo
         return super.supportsInterface(interfaceId);
     }
 
-    function _update(address to, uint256 tokenId, address auth)
-        internal
-        override(ERC721, ERC721Votes)
-        returns (address)
-    {
-        return super._update(to, tokenId, auth);
-    }
-
-    function _increaseBalance(address account, uint128 value)
+    function _afterTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize)
         internal
         override(ERC721, ERC721Votes)
     {
-        super._increaseBalance(account, value);
+        super._afterTokenTransfer(from, to, tokenId, batchSize);
     }
 }
